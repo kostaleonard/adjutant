@@ -54,6 +54,8 @@ model.fit(
 
 ## Request ML model prediction on an input
 
+`AdjutantPredictor()` takes as an argument a function that transforms an input tensor of several samples into any output.
+
 ```python
 import random
 from adjutant.keras import AdjutantPredictor
@@ -64,7 +66,7 @@ def prediction_function(input_tensor: np.ndarray) -> str:
         return 'This is NOT an image of a dog.'
     return 'This is an image of a dog.'
 
-predictor = AdjutantPredictor()
+predictor = AdjutantPredictor(prediction_function)
 while True:
     predictor.run()
 ```
