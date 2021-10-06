@@ -1,3 +1,5 @@
+# TODO remove this file
+
 import logging
 import discord
 

@@ -1,6 +1,6 @@
 # Adjutant
 
-A package for delivering updates on software tasks over Discord, Slack, and other platforms.
+`adjutant` is a package for delivering updates on software tasks over Discord and other platforms.
 
 # Installation
 
