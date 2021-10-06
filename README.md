@@ -10,7 +10,7 @@ pip install adjutant
 
 ## Discord
 
-To allow `adjutant` to post to discord as a bot, first follow [these instructions](https://discordpy.readthedocs.io/en/stable/discord.html) for creating a Discord bot and adding it to your Server. You can then use your bot's token in `adjutant.init(discord_token='YOUR_TOKEN_HERE')`.
+To allow `adjutant` to post to discord as a bot, first follow [these instructions](https://discordpy.readthedocs.io/en/stable/discord.html) for creating a Discord bot and adding it to your Server. You then add your bot's token in `adjutant.init(discord_token='YOUR_TOKEN_HERE')`.
 
 **Note: Be careful not to share your bot's token. Consider storing it in an environment variable or file that is not checked in to version control.**
 
@@ -29,7 +29,7 @@ adjutant.post('Hello, world!')
 ```python
 import adjutant
 adjutant.init(discord_token='YOUR_TOKEN_HERE')
-adjutant.post('My image caption.', image_filename='my_image.png')
+adjutant.post('My image caption.', file='my_image.png')
 ```
 
 ## As a TensorFlow Callback
@@ -64,7 +64,7 @@ model.fit(
 
 ## Request ML model prediction on an input
 
-`AdjutantPredictor()` takes as an argument a function that transforms an input tensor of several samples into any output.
+`AdjutantPredictor()` takes as an argument a function that transforms an input tensor of several samples into any output. The `trigger` argument tells `adjutant` the prefix of the posts on which users are requesting prediction.
 
 ```python
 import random
@@ -80,6 +80,6 @@ def prediction_function(input_tensor: np.ndarray) -> str:
     return 'This is an image of a dog.'
 
 predictor = AdjutantPredictor(prediction_function)
-while True:
-    predictor.handle_request()
+# This will block while it waits for and handles requests on messages.
+predictor.run(trigger='$predict')
 ```
