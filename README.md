@@ -8,12 +8,19 @@ A package for delivering updates on long-running software tasks over Discord, Sl
 pip install adjutant
 ```
 
+## Discord
+
+To allow `adjutant` to post to discord as a bot, first follow [these instructions](https://discordpy.readthedocs.io/en/stable/discord.html) for creating a Discord bot and adding it to your Server. You can then use your bot's token in `adjutant.init(discord_token='YOUR_TOKEN_HERE')`.
+
+**Note: Be careful not to share your bot's token. Consider storing it in an environment variable or file that is not checked in to version control.**
+
 # Examples
 
 ## Post a message
 
 ```python
 import adjutant
+adjutant.init(discord_token='YOUR_TOKEN_HERE')
 adjutant.post('Hello, world!')
 ```
 
@@ -21,6 +28,7 @@ adjutant.post('Hello, world!')
 
 ```python
 import adjutant
+adjutant.init(discord_token='YOUR_TOKEN_HERE')
 adjutant.post('My image caption.', image_filename='my_image.png')
 ```
 
@@ -30,8 +38,10 @@ By default, `AdjutantCallback()` will create a callback that posts the training 
 
 ```python
 import tensorflow as tf
+import adjutant
 from adjutant.keras import AdjutantCallback
 
+adjutant.init(discord_token='YOUR_TOKEN_HERE')
 callbacks = [AdjutantCallback()]
 
 # TODO add MNIST model
@@ -58,7 +68,10 @@ model.fit(
 
 ```python
 import random
+import adjutant
 from adjutant.keras import AdjutantPredictor
+
+adjutant.init(discord_token='YOUR_TOKEN_HERE')
 
 def prediction_function(input_tensor: np.ndarray) -> str:
     # Prediction logic goes here.
