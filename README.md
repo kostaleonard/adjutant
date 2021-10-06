@@ -68,5 +68,5 @@ def prediction_function(input_tensor: np.ndarray) -> str:
 
 predictor = AdjutantPredictor(prediction_function)
 while True:
-    predictor.run()
+    predictor.handle_request()
 ```
