@@ -32,4 +32,4 @@ You will see it log in to Discord. It is now waiting for new experiments to appe
 python mnist_model.py
 ```
 
-When your run finishes, you'll see `adjutant` post summary statistics and a link to the run on [wandb.ai](wandb.ai).
+When your run finishes, you'll see `adjutant` post summary statistics and a link to the run on [wandb.ai](https://wandb.ai).
