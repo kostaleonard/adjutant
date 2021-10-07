@@ -22,6 +22,8 @@ Wherever you plan to run `adjutant`, make sure you are either logged in to your 
 
 ## Examples
 
+For more advanced examples, please see [examples](examples), starting with [the MNIST example](examples/mnist).
+
 ### Basic `adjutant`
 
 The most basic formulation of `adjutant` provides updates on WandB experiments under the given project name. Your WandB entity name is your account name, and the project title is the name of the project you have created (or will create) to store experiments.
