@@ -9,7 +9,8 @@ import discord
 from discord.ext import tasks
 from discord import TextChannel
 
-SECONDS_BETWEEN_WANDB_CHECKS = 60
+# TODO change to 60 after prototyping
+SECONDS_BETWEEN_WANDB_CHECKS = 10
 
 
 class Adjutant(discord.Client):
@@ -21,6 +22,7 @@ class Adjutant(discord.Client):
     channel_name: str
     channel: Optional[TextChannel]
     seconds_between_wandb_checks: int
+    _reported_runs: set[Run]
 
     def __init__(
             self,
@@ -50,7 +52,8 @@ class Adjutant(discord.Client):
         self.run_experiment_fn = run_experiment_fn
         self.channel_name = channel_name
         self.channel = None
-        self.my_background_task.start()
+        self._reported_runs = self._get_project_runs()
+        self.check_wandb_for_new_runs.start()
 
     def _get_channel(self) -> Optional[TextChannel]:
         """Returns the channel whose name is self.channel_name, or None if no
@@ -78,16 +81,22 @@ class Adjutant(discord.Client):
         sets self.channel to the one requested by the user."""
         logging.log(INFO, f'Logged in as {self.user.name}, {self.user.id}')
         self.channel = self._get_channel()
+        await self.channel.send(
+            f'Adjutant starting! Found {len(self._reported_runs)} runs for '
+            f'project {self._wandb_entity}/{self._wandb_project_title}.')
 
     @tasks.loop(seconds=SECONDS_BETWEEN_WANDB_CHECKS)
-    async def my_background_task(self):
-        # TODO docstring
-        # TODO change name
+    async def check_wandb_for_new_runs(self) -> None:
+        """Checks WandB for new runs for this project and posts the results of
+        those runs."""
         runs = self._get_project_runs()
-        await self.channel.send(f'Found {len(runs)} runs for project.')
+        # TODO only report new runs
+        await self.channel.send(f'Found {len(runs)} runs for project '
+                                f'{self._wandb_entity}/'
+                                f'{self._wandb_project_title}.')
 
-    @my_background_task.before_loop
-    async def before_my_task(self):
-        # TODO docstring
-        # TODO change name
+    @check_wandb_for_new_runs.before_loop
+    async def _before_check_wandb_for_new_runs(self) -> None:
+        """Prevents the check_wandb_for_new_runs loop from running before the
+        client has logged in."""
         await self.wait_until_ready()
