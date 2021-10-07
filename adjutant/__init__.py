@@ -1,5 +1,4 @@
-"""adjutant is a package for delivering updates on software tasks over Discord
-and other platforms."""
+"""adjutant is a package for managing ML experiments over Discord."""
 
 from adjutant import sdk
 

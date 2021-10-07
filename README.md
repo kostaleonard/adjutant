@@ -1,85 +1,50 @@
-# Adjutant
+# adjutant
 
-`adjutant` is a package for delivering updates on software tasks over Discord and other platforms.
+`adjutant` is a package for managing ML experiments over Discord.
 
-# Installation
+## Installation
 
 ```bash
 pip install adjutant
 ```
 
-## Discord
+### Discord bot creation
 
-To allow `adjutant` to post to discord as a bot, first follow [these instructions](https://discordpy.readthedocs.io/en/stable/discord.html) for creating a Discord bot and adding it to your Server. You then add your bot's token in `adjutant.init(discord_token='YOUR_TOKEN_HERE')`.
+To allow `adjutant` to post to discord as a bot, first follow [these instructions](https://discordpy.readthedocs.io/en/stable/discord.html) for creating a Discord bot and adding it to your Server. You then create an `Adjutant` object with your bot token.
 
 **Note: Be careful not to share your bot's token. Consider storing it in an environment variable or file that is not checked in to version control.**
 
-# Examples
+### WandB setup
 
-## Post a message
+`adjutant` is designed to work with WandB for ML experiment tracking. Create a WandB account at [wandb.ai](https://wandb.ai/).
+
+## Examples
+
+### Basic `adjutant`
+
+The most basic formulation of `adjutant` provides updates on WandB experiments under the given project name.
 
 ```python
-import adjutant
-adjutant.init(discord_token='YOUR_TOKEN_HERE')
-adjutant.post('Hello, world!')
+from adjutant import Adjutant
+client = Adjutant('my-wandb-project-title')
+client.run('my-discord-token')
 ```
 
-## Post an image
+### `adjutant` with experiment launching
+
+By providing a `run_experiment_fn` constructor argument, `adjutant` will be able to respond to user requests on Discord to run a new experiment. By default, `adjutant` will execute `run_experiment_fn` in a subprocess so that it can still respond to new requests. `run_experiment_fn` may also request another entity, e.g. Kubernetes, to initiate the experiment on its behalf rather than actually running the experiment itself.
 
 ```python
-import adjutant
-adjutant.init(discord_token='YOUR_TOKEN_HERE')
-adjutant.post('My image caption.', file='my_image.png')
-```
+from adjutant import Adjutant
 
-## As a TensorFlow Callback
 
-By default, `AdjutantCallback()` will create a callback that posts the training and (if available) validation metrics after every epoch. Optional arguments allow it to post arbitrary data, e.g., input samples (as images, raw text, CSV data, etc.), misclassified training samples, the loss curve, neural network output (generated images, text, etc.).
+def run_experiment_fn(hyperparams: dict[str, Any]) -> None:
+    """Runs a new experiment with the given hyperparameters.
+    :param hyperparams: The hyperparameters to use for the experiment.
+    """
+    # Tell adjutant how to launch a new experiment.
 
-```python
-import tensorflow as tf
-import adjutant
-from adjutant.keras import AdjutantCallback
-
-adjutant.init(discord_token='YOUR_TOKEN_HERE')
-callbacks = [AdjutantCallback()]
-
-# TODO add MNIST model
-model = tf.keras.models.Sequential([
-    tf.keras.layers.Flatten(input_shape=(28, 28)),
-    tf.keras.layers.Dense(128, activation='relu'),
-    tf.keras.layers.Dense(10, activation='softmax')])
-model.compile(
-    optimizer='adam',
-    loss='categorical_crossentropy',
-    metrics=['accuracy'])
-model.fit(
-    x=x_train,
-    y=y_train,
-    batch_size=32,
-    epochs=10,
-    validation_split=0.2,
-    callbacks=callbacks)
-```
-
-## Request ML model prediction on an input
-
-`AdjutantPredictor()` takes as an argument a function that transforms an input tensor of several samples into any output. The `trigger` argument tells `adjutant` the prefix of the posts on which users are requesting prediction.
-
-```python
-import random
-import adjutant
-from adjutant.keras import AdjutantPredictor
-
-adjutant.init(discord_token='YOUR_TOKEN_HERE')
-
-def prediction_function(input_tensor: np.ndarray) -> str:
-    # Prediction logic goes here.
-    if random.random() < 0.5:
-        return 'This is NOT an image of a dog.'
-    return 'This is an image of a dog.'
-
-predictor = AdjutantPredictor(prediction_function)
-# This will block while it waits for and handles requests on messages.
-predictor.run(trigger='$predict')
+client = Adjutant('my-wandb-project-title',
+                  run_experiment_fn=run_experiment_fn)
+client.run('my-discord-token')
 ```
