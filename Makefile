@@ -6,5 +6,5 @@ help:
 install:
 	pip install -r requirements.txt
 
-run_example:
-	PYTHONPATH=. python adjutant/example.py
+run_example_mnist_adjutant:
+	PYTHONPATH=. python examples/mnist/mnist_adjutant.py
