@@ -9,6 +9,8 @@ import discord
 from discord.ext import tasks
 from discord import TextChannel
 
+SECONDS_BETWEEN_WANDB_CHECKS = 60
+
 
 class Adjutant(discord.Client):
     """The Adjutant Discord client."""
@@ -18,15 +20,17 @@ class Adjutant(discord.Client):
     run_experiment_fn: Optional[Callable[[dict[str, Any]], None]]
     channel_name: str
     channel: Optional[TextChannel]
+    seconds_between_wandb_checks: int
 
-    def __init__(self,
-                 wandb_entity: str,
-                 wandb_project_title: str,
-                 run_experiment_fn: Optional[
-                     Callable[[dict[str, Any]], None]] = None,
-                 channel_name: str = 'general',
-                 *args,
-                 **kwargs) -> None:
+    def __init__(
+            self,
+            wandb_entity: str,
+            wandb_project_title: str,
+            run_experiment_fn: Optional[
+                Callable[[dict[str, Any]], None]] = None,
+            channel_name: str = 'general',
+            *args,
+            **kwargs) -> None:
         """Instantiates the object.
 
         :param wandb_entity: The WandB entity name (username or account name)
@@ -69,12 +73,13 @@ class Adjutant(discord.Client):
             f'{self._wandb_entity}/{self._wandb_project_title}')
         return set(runs)
 
-    async def on_ready(self):
-        # TODO docstring
+    async def on_ready(self) -> None:
+        """Runs once the client has successfully logged in. Logs the event and
+        sets self.channel to the one requested by the user."""
         logging.log(INFO, f'Logged in as {self.user.name}, {self.user.id}')
         self.channel = self._get_channel()
 
-    @tasks.loop(seconds=10)
+    @tasks.loop(seconds=SECONDS_BETWEEN_WANDB_CHECKS)
     async def my_background_task(self):
         # TODO docstring
         # TODO change name
