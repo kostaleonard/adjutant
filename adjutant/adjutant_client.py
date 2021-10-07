@@ -37,6 +37,7 @@ class Adjutant(discord.Client):
         self.wandb_entity = wandb_entity
         self.wandb_project_title = wandb_project_title
         self.run_experiment_fn = run_experiment_fn
+        self.my_background_task.start()
 
     def _get_project_runs(self) -> set[Run]:
         """Returns the set of all Runs for this project.
