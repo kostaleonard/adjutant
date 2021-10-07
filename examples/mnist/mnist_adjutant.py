@@ -1,11 +1,11 @@
-"""Runs the adjutant client for the mnist example."""
+"""Runs the adjutant client for the MNIST example."""
 
 import os
 import logging
 from adjutant.adjutant_client import Adjutant
+from examples.mnist.mnist_model import WANDB_PROJECT_TITLE
 
 WANDB_ENTITY = 'kostaleonard'
-WANDB_PROJECT_TITLE = 'mnist'
 DISCORD_TOKEN_ENVIRONMENT_VAR = 'DISCORD_ADJ_TOKEN'
 
 

@@ -1,2 +1,4 @@
 discord.py
 wandb
+numpy
+tensorflow
