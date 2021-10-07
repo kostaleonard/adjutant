@@ -40,6 +40,7 @@ from adjutant import Adjutant
 
 def run_experiment_fn(hyperparams: dict[str, Any]) -> None:
     """Runs a new experiment with the given hyperparameters.
+    
     :param hyperparams: The hyperparameters to use for the experiment.
     """
     # Tell adjutant how to launch a new experiment.
