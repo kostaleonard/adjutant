@@ -5,6 +5,7 @@ import wandb
 from wandb.apis.public import Run
 import discord
 from discord.ext import tasks
+from discord import TextChannel
 
 
 class Adjutant(discord.Client):
@@ -13,12 +14,15 @@ class Adjutant(discord.Client):
     wandb_entity: str
     wandb_project_title: str
     run_experiment_fn: Optional[Callable[[dict[str, Any]], None]]
+    channel_name: str
+    channel: Optional[TextChannel]
 
     def __init__(self,
                  wandb_entity: str,
                  wandb_project_title: str,
                  run_experiment_fn: Optional[
                      Callable[[dict[str, Any]], None]] = None,
+                 channel_name: str = 'general',
                  *args,
                  **kwargs) -> None:
         """Instantiates the object.
@@ -31,13 +35,29 @@ class Adjutant(discord.Client):
             hyperparameters. This function may also request another entity, e.g.
             Kubernetes, to initiate the experiment on its behalf rather than
             actually running the experiment itself.
+        :param channel_name: The name of the channel in which to post updates.
         """
         super().__init__(*args, **kwargs)
         self.wandb_api = wandb.Api()
         self.wandb_entity = wandb_entity
         self.wandb_project_title = wandb_project_title
         self.run_experiment_fn = run_experiment_fn
+        self.channel_name = channel_name
+        self.channel = None
         self.my_background_task.start()
+
+    def _get_channel(self) -> Optional[TextChannel]:
+        """Returns the channel whose name is self.channel_name, or None if no
+        such channel exists.
+
+        :return: The channel whose name is self.channel_name, or None if no such
+            channel exists.
+        """
+        for guild in self.guilds:
+            for channel in guild.channels:
+                if channel.name == self.channel_name:
+                    return channel
+        return None
 
     def _get_project_runs(self) -> set[Run]:
         """Returns the set of all Runs for this project.
@@ -54,21 +74,17 @@ class Adjutant(discord.Client):
         print(self.user.name)
         print(self.user.id)
         print('------')
-        # TODO this is just testing code.
-        channel = self.get_channel(795713981909172246)
-        runs = self._get_project_runs()
-        await channel.send(f'Found {len(runs)} runs for project.')
+        self.channel = self._get_channel()
 
-    @tasks.loop(seconds=10)  # task runs every 60 seconds
+    @tasks.loop(seconds=10)
     async def my_background_task(self):
-        # TODO loop not working
         # TODO docstring
-        # TODO get the channel by name, default to general
-        channel = self.get_channel(795713981909172246)
+        # TODO change name
         runs = self._get_project_runs()
-        await channel.send(f'Found {len(runs)} runs for project.')
+        await self.channel.send(f'Found {len(runs)} runs for project.')
 
     @my_background_task.before_loop
     async def before_my_task(self):
         # TODO docstring
+        # TODO change name
         await self.wait_until_ready()
