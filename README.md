@@ -18,15 +18,17 @@ To allow `adjutant` to post to discord as a bot, first follow [these instruction
 
 `adjutant` is designed to work with WandB for ML experiment tracking. Create a WandB account at [wandb.ai](https://wandb.ai/).
 
+Wherever you plan to run `adjutant`, make sure you are either logged in to your WandB account, or have an API key populated in the `WAND_API_KEY` environment variable. More information is available in [the WandB docs](https://docs.wandb.ai/guides/track/public-api-guide).
+
 ## Examples
 
 ### Basic `adjutant`
 
-The most basic formulation of `adjutant` provides updates on WandB experiments under the given project name.
+The most basic formulation of `adjutant` provides updates on WandB experiments under the given project name. Your WandB entity name is your account name, and the project title is the name of the project you have created (or will create) to store experiments.
 
 ```python
 from adjutant import Adjutant
-client = Adjutant('my-wandb-project-title')
+client = Adjutant('my-wandb-entity', 'my-wandb-project-title')
 client.run('my-discord-token')
 ```
 
@@ -43,9 +45,10 @@ def run_experiment_fn(hyperparams: dict[str, Any]) -> None:
     
     :param hyperparams: The hyperparameters to use for the experiment.
     """
-    # Tell adjutant how to launch a new experiment.
+    src
 
-client = Adjutant('my-wandb-project-title',
+client = Adjutant('my-wandb-entity',
+                  'my-wandb-project-title',
                   run_experiment_fn=run_experiment_fn)
 client.run('my-discord-token')
 ```

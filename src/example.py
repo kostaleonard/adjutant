@@ -9,6 +9,7 @@ logging.basicConfig(level=logging.INFO)
 with open('/Users/leo/.discord/token', 'r') as infile:
     discord_token = infile.read().strip()
 
+'''
 client = discord.Client()
 
 
@@ -29,5 +30,8 @@ async def on_message(message) -> None:
         await message.channel.send(
             'Here\'s that picture you wanted.',
             file=discord.File('/tmp/my_image.png'))
+'''
 
-client.run(discord_token)
+from src.adjutant import Adjutant
+adj = Adjutant('kostaleonard', 'mnist')
+adj.run(discord_token)
