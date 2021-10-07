@@ -1,6 +1,8 @@
 """Contains the Adjutant Discord client class."""
 
 from typing import Callable, Optional, Any
+import logging
+from logging import INFO
 import wandb
 from wandb.apis.public import Run
 import discord
@@ -53,10 +55,9 @@ class Adjutant(discord.Client):
         :return: The channel whose name is self.channel_name, or None if no such
             channel exists.
         """
-        for guild in self.guilds:
-            for channel in guild.channels:
-                if channel.name == self.channel_name:
-                    return channel
+        for channel in self.get_all_channels():
+            if channel.name == self.channel_name:
+                return channel
         return None
 
     def _get_project_runs(self) -> set[Run]:
@@ -70,10 +71,7 @@ class Adjutant(discord.Client):
 
     async def on_ready(self):
         # TODO docstring
-        print('Logged in as')
-        print(self.user.name)
-        print(self.user.id)
-        print('------')
+        logging.log(INFO, f'Logged in as {self.user.name}, {self.user.id}')
         self.channel = self._get_channel()
 
     @tasks.loop(seconds=10)
