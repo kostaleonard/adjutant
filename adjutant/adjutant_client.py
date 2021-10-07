@@ -12,9 +12,9 @@ from discord import TextChannel
 
 class Adjutant(discord.Client):
     """The Adjutant Discord client."""
-    wandb_api: wandb.Api
-    wandb_entity: str
-    wandb_project_title: str
+    _wandb_api: wandb.Api
+    _wandb_entity: str
+    _wandb_project_title: str
     run_experiment_fn: Optional[Callable[[dict[str, Any]], None]]
     channel_name: str
     channel: Optional[TextChannel]
@@ -40,9 +40,9 @@ class Adjutant(discord.Client):
         :param channel_name: The name of the channel in which to post updates.
         """
         super().__init__(*args, **kwargs)
-        self.wandb_api = wandb.Api()
-        self.wandb_entity = wandb_entity
-        self.wandb_project_title = wandb_project_title
+        self._wandb_api = wandb.Api()
+        self._wandb_entity = wandb_entity
+        self._wandb_project_title = wandb_project_title
         self.run_experiment_fn = run_experiment_fn
         self.channel_name = channel_name
         self.channel = None
@@ -65,8 +65,8 @@ class Adjutant(discord.Client):
 
         :return: The set of all Runs for this project.
         """
-        runs = self.wandb_api.runs(
-            f'{self.wandb_entity}/{self.wandb_project_title}')
+        runs = self._wandb_api.runs(
+            f'{self._wandb_entity}/{self._wandb_project_title}')
         return set(runs)
 
     async def on_ready(self):
