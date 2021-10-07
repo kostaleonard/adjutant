@@ -48,13 +48,20 @@ class Adjutant(discord.Client):
         return set(runs)
 
     async def on_ready(self):
+        # TODO docstring
         print('Logged in as')
         print(self.user.name)
         print(self.user.id)
         print('------')
+        # TODO this is just testing code.
+        channel = self.get_channel(795713981909172246)
+        runs = self._get_project_runs()
+        await channel.send(f'Found {len(runs)} runs for project.')
 
     @tasks.loop(seconds=10)  # task runs every 60 seconds
     async def my_background_task(self):
+        # TODO loop not working
+        # TODO docstring
         # TODO get the channel by name, default to general
         channel = self.get_channel(795713981909172246)
         runs = self._get_project_runs()
@@ -62,4 +69,5 @@ class Adjutant(discord.Client):
 
     @my_background_task.before_loop
     async def before_my_task(self):
+        # TODO docstring
         await self.wait_until_ready()

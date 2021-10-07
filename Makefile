@@ -7,5 +7,4 @@ install:
 	pip install -r requirements.txt
 
 run_example:
-	#cd src && PYTHONPATH=$(PYTHONPATH):.. python example.py
-	PYTHONPATH=. python src/example.py
+	PYTHONPATH=. python adjutant/example.py

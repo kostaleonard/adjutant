@@ -1,7 +1,6 @@
 # TODO remove this file
 
 import logging
-import discord
 
 logging.basicConfig(level=logging.INFO)
 
@@ -32,6 +31,6 @@ async def on_message(message) -> None:
             file=discord.File('/tmp/my_image.png'))
 '''
 
-from src.adjutant import Adjutant
+from adjutant.adjutant_client import Adjutant
 adj = Adjutant('kostaleonard', 'mnist')
 adj.run(discord_token)
