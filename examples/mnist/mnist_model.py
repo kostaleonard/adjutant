@@ -1,17 +1,22 @@
 """Trains a new model on the MNIST dataset."""
 
 import os
-from typing import Tuple, Dict, Any, Optional
+from typing import Any, Optional
 from datetime import datetime
 import numpy as np
-import tensorflow as tf
+from tensorflow.keras.datasets import mnist
+from tensorflow.keras.models import Model, Sequential
+from tensorflow.keras.layers import Flatten, Dense
+from tensorflow.keras.optimizers import Adam
+from tensorflow.keras.losses import SparseCategoricalCrossentropy
 from tensorflow.keras.callbacks import TensorBoard, ModelCheckpoint, History
 import wandb
 from wandb.keras import WandbCallback
 
+MNIST_INPUT_SHAPE = (28, 28)
 DEFAULT_TENSORBOARD_LOGDIR = os.path.join('logs', 'mnist')
 DEFAULT_MODEL_CHECKPOINT_FILENAME = os.path.join('models', 'mnist_model.h5')
-DEFAULT_MODEL_ARGS = {'input_shape': (28, 28)}
+DEFAULT_MODEL_ARGS = {'num_layers': 1}
 DEFAULT_TRAIN_ARGS = {'epochs': 10,
                       'batch_size': 32,
                       'validation_split': 0.2,
@@ -23,15 +28,14 @@ MAX_PIXEL_VALUE = 255
 WANDB_PROJECT_TITLE = 'mnist'
 
 
-def get_dataset() -> Tuple[Tuple[np.ndarray, np.ndarray],
-                           Tuple[np.ndarray, np.ndarray]]:
+def get_dataset() -> ((np.ndarray, np.ndarray), (np.ndarray, np.ndarray)):
     """Returns the dataset that will be fed into the model as 2 2-tuples:
     (x_train, y_train), (x_test, y_test). The returned dataset will be
     normalized.
 
     :return: (x_train, y_train), (x_test, y_test)
     """
-    (x_train, y_train), (x_test, y_test) = tf.keras.datasets.mnist.load_data()
+    (x_train, y_train), (x_test, y_test) = mnist.load_data()
     x_train = _normalize_images(x_train)
     x_test = _normalize_images(x_test)
     return (x_train, y_train), (x_test, y_test)
@@ -49,8 +53,7 @@ def _normalize_images(images: np.ndarray) -> np.ndarray:
     return images.astype(np.float32) / MAX_PIXEL_VALUE
 
 
-def get_model(model_args: Optional[Dict[str, Any]] = None) -> \
-        tf.keras.Model:
+def get_model(model_args: Optional[dict[str, Any]] = None) -> Model:
     """Returns the model that will be used for training, testing, and
     prediction.
 
@@ -63,21 +66,22 @@ def get_model(model_args: Optional[Dict[str, Any]] = None) -> \
         model_args = DEFAULT_MODEL_ARGS
     else:
         model_args = {**DEFAULT_MODEL_ARGS, **model_args}
-    model = tf.keras.models.Sequential([
-        tf.keras.layers.Flatten(input_shape=model_args['input_shape']),
-        tf.keras.layers.Dense(128, activation='relu'),
-        tf.keras.layers.Dense(10)])
+    model = Sequential()
+    model.add(Flatten(input_shape=MNIST_INPUT_SHAPE))
+    for _ in range(model_args['num_layers']):
+        model.add(Dense(128, activation='relu'))
+    model.add(Dense(10))
     model.compile(
-        optimizer=tf.keras.optimizers.Adam(learning_rate=0.001),
-        loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True),
+        optimizer=Adam(learning_rate=0.001),
+        loss=SparseCategoricalCrossentropy(from_logits=True),
         metrics=['accuracy'])
     return model
 
 
-def train_model(model: tf.keras.Model,
+def train_model(model: Model,
                 x_train: np.ndarray,
                 y_train: np.ndarray,
-                train_args: Optional[Dict[str, Any]] = None) -> History:
+                train_args: Optional[dict[str, Any]] = None) -> History:
     """Trains the model and returns the History object from training.
 
     :param model: The Keras Model.
@@ -109,15 +113,15 @@ def train_model(model: tf.keras.Model,
     if train_args['overfit_single_batch']:
         x_train = x_train[:train_args['batch_size']]
         y_train = y_train[:train_args['batch_size']]
-    return model.fit(x=x_train, y=y_train,
+    return model.fit(x=x_train,
+                     y=y_train,
                      batch_size=train_args['batch_size'],
                      epochs=train_args['epochs'],
                      validation_split=train_args['validation_split'],
                      callbacks=callbacks)
 
 
-def eval_model(model: tf.keras.Model, x_test: np.ndarray,
-               y_test: np.ndarray) -> float:
+def eval_model(model: Model, x_test: np.ndarray, y_test: np.ndarray) -> float:
     """Evaluates the model on the test set and returns the accuracy.
 
     :param model: The Keras Model.
