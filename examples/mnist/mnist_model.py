@@ -1,6 +1,8 @@
 """Trains a new model on the MNIST dataset."""
 
 import os
+import argparse
+import json
 from typing import Any, Optional
 from datetime import datetime
 import numpy as np
@@ -145,16 +147,24 @@ def run_experiment(hyperparams: dict) -> None:
     print('Test accuracy: {0}'.format(test_acc))
 
 
+def get_hyperparameters() -> dict:
+    """Returns the hyperparameters from the command line arguments.
+
+    :return: The hyperparameters to use in model creation and training.
+    """
+    parser = argparse.ArgumentParser(description='Trains a model on MNIST.')
+    parser.add_argument('hyperparams', nargs='?', type=str,
+                        help='A JSON-formatted string containing the '
+                             'hyperparameters. May be omitted for default '
+                             'hyperparameters.')
+    args = parser.parse_args()
+    hyperparams = json.loads(args.hyperparams) if args.hyperparams else {}
+    return hyperparams
+
+
 def main() -> None:
     """Runs the program."""
-    # TODO put arg parser in its own function.
-    import argparse
-    parser = argparse.ArgumentParser()
-    parser.add_argument('hyperparams', nargs='?')
-    args = parser.parse_args()
-    import json
-    hyperparams = json.loads(args.hyperparams) if args.hyperparams else {}
-    print(hyperparams)
+    hyperparams = get_hyperparameters()
     run_experiment(hyperparams)
 
 
