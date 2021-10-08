@@ -10,10 +10,26 @@ WANDB_ENTITY = 'kostaleonard'
 DISCORD_TOKEN_ENVIRONMENT_VAR = 'DISCORD_ADJ_TOKEN'
 
 
+# TODO this should be in the model file
+def run_experiment(hyperparams: dict) -> None:
+    """Trains a new model with the given hyperparameters.
+
+    :param hyperparams: The hyperparameters to use in model creation and
+        training.
+    """
+    # TODO actually run experiment.
+    import time
+    print('Simulating a long running experiment')
+    time.sleep(20)
+    print('Experiment complete')
+
+
 def main() -> None:
     """Runs the program."""
     logging.basicConfig(level=logging.INFO)
-    adj = Adjutant(WANDB_ENTITY, WANDB_PROJECT_TITLE)
+    adj = Adjutant(WANDB_ENTITY,
+                   WANDB_PROJECT_TITLE,
+                   run_experiment_fn=run_experiment)
     adj.run(os.environ[DISCORD_TOKEN_ENVIRONMENT_VAR])
 
 

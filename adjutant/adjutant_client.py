@@ -1,10 +1,11 @@
 """Contains the Adjutant Discord client class."""
 
 from typing import Callable, Optional
-import json
-from json.decoder import JSONDecodeError
 import logging
 from logging import INFO
+import json
+from json.decoder import JSONDecodeError
+from multiprocessing import Process
 import wandb
 from wandb.apis.public import Run
 import discord
@@ -21,10 +22,9 @@ class Adjutant(discord.Client):
     _wandb_api: wandb.Api
     _wandb_entity: str
     _wandb_project_title: str
-    run_experiment_fn: Optional[Callable[[dict], None]]
+    _run_experiment_fn: Optional[Callable[[dict], None]]
     channel_name: str
     channel: Optional[TextChannel]
-    seconds_between_wandb_checks: int
     _reported_runs: set[Run]
 
     def __init__(
@@ -52,7 +52,7 @@ class Adjutant(discord.Client):
         self._wandb_api = wandb.Api()
         self._wandb_entity = wandb_entity
         self._wandb_project_title = wandb_project_title
-        self.run_experiment_fn = run_experiment_fn
+        self._run_experiment_fn = run_experiment_fn
         self.channel_name = channel_name
         self.channel = None
         self._reported_runs = self._get_project_runs()
@@ -124,6 +124,16 @@ class Adjutant(discord.Client):
             hyperparams = {}
         return hyperparams
 
+    def run_experiment(self, hyperparams: dict) -> None:
+        """Runs an experiment in a subprocess.
+
+        :param hyperparams: The hyperparameters to pass to the experiment
+            function.
+        """
+        proc = Process(target=self._run_experiment_fn,
+                       args=(hyperparams,))
+        proc.start()
+
     async def on_message(self, message: Message) -> None:
         """Runs every time a message is posted (including by this bot). Responds
         to user commands to initiate new runs, etc. If the message's channel
@@ -136,7 +146,7 @@ class Adjutant(discord.Client):
         if message.content.startswith(COMMAND_HELLO):
             await self.channel.send('Hello!')
         elif message.content.startswith(COMMAND_EXPERIMENT):
-            if not self.run_experiment_fn:
+            if not self._run_experiment_fn:
                 await self.channel.send('No experiment function provided; '
                                         'cannot launch experiment.')
             else:
@@ -144,4 +154,4 @@ class Adjutant(discord.Client):
                 await self.channel.send(
                     f'Running new experiment with the following '
                     f'hyperparameters.\n{json.dumps(hyperparams, indent=4)}')
-                self.run_experiment_fn(hyperparams)
+                self.run_experiment(hyperparams)
