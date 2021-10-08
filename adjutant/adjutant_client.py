@@ -1,6 +1,8 @@
 """Contains the Adjutant Discord client class."""
 
-from typing import Callable, Optional, Any
+from typing import Callable, Optional
+import json
+from json.decoder import JSONDecodeError
 import logging
 from logging import INFO
 import wandb
@@ -9,8 +11,9 @@ import discord
 from discord.ext import tasks
 from discord import TextChannel, Message
 
-# TODO change to 60 after prototyping
-SECONDS_BETWEEN_WANDB_CHECKS = 10
+SECONDS_BETWEEN_WANDB_CHECKS = 60
+COMMAND_HELLO = '$hello'
+COMMAND_EXPERIMENT = '$experiment'
 
 
 class Adjutant(discord.Client):
@@ -18,7 +21,7 @@ class Adjutant(discord.Client):
     _wandb_api: wandb.Api
     _wandb_entity: str
     _wandb_project_title: str
-    run_experiment_fn: Optional[Callable[[dict[str, Any]], None]]
+    run_experiment_fn: Optional[Callable[[dict], None]]
     channel_name: str
     channel: Optional[TextChannel]
     seconds_between_wandb_checks: int
@@ -29,7 +32,7 @@ class Adjutant(discord.Client):
             wandb_entity: str,
             wandb_project_title: str,
             run_experiment_fn: Optional[
-                Callable[[dict[str, Any]], None]] = None,
+                Callable[[dict], None]] = None,
             channel_name: str = 'general',
             *args,
             **kwargs) -> None:
@@ -103,6 +106,24 @@ class Adjutant(discord.Client):
         client has logged in."""
         await self.wait_until_ready()
 
+    @staticmethod
+    def _get_hyperparams(text: str) -> dict:
+        """Returns the hyperparameter dictionary from the text of the user's
+        post. Returns the empty dict if the text contains an improperly
+        formatted dictionary or no dictionary at all.
+
+        :param text: The text of the user's message, starting with
+            COMMAND_EXPERIMENT.
+        :return: The hyperparameter dictionary from the text of the user's post
+            (may be the empty dict).
+        """
+        args = text[len(COMMAND_EXPERIMENT):].strip()
+        try:
+            hyperparams = json.loads(args)
+        except JSONDecodeError:
+            hyperparams = {}
+        return hyperparams
+
     async def on_message(self, message: Message) -> None:
         """Runs every time a message is posted (including by this bot). Responds
         to user commands to initiate new runs, etc. If the message's channel
@@ -112,5 +133,10 @@ class Adjutant(discord.Client):
         """
         if message.author == self.user or message.channel != self.channel:
             return
-        if message.content.startswith('$hello'):
+        if message.content.startswith(COMMAND_HELLO):
             await self.channel.send('Hello!')
+        elif message.content.startswith(COMMAND_EXPERIMENT):
+            hyperparams = Adjutant._get_hyperparams(message.content)
+            await self.channel.send(
+                f'Running new experiment with the following hyperparameters.\n'
+                f'{json.dumps(hyperparams, indent=4)}')
