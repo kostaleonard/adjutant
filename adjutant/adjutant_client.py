@@ -7,7 +7,7 @@ import wandb
 from wandb.apis.public import Run
 import discord
 from discord.ext import tasks
-from discord import TextChannel
+from discord import TextChannel, Message
 
 # TODO change to 60 after prototyping
 SECONDS_BETWEEN_WANDB_CHECKS = 10
@@ -102,3 +102,15 @@ class Adjutant(discord.Client):
         """Prevents the check_wandb_for_new_runs loop from running before the
         client has logged in."""
         await self.wait_until_ready()
+
+    async def on_message(self, message: Message) -> None:
+        """Runs every time a message is posted (including by this bot). Responds
+        to user commands to initiate new runs, etc. If the message's channel
+        does not match that of this bot, the post is ignored.
+
+        :param message: The user's post on the Discord server, in any channel.
+        """
+        if message.author == self.user or message.channel != self.channel:
+            return
+        if message.content.startswith('$hello'):
+            await self.channel.send('Hello!')
