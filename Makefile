@@ -1,16 +1,20 @@
 all: help
 
 help:
-	# TODO print usage information
+	@echo "To install required packages, run 'make install' from a clean 'python:3.9' (or higher) conda environment."
 
 install:
 	pip install -r requirements.txt
 
 pylint:
-	# TODO linting
+	pylint adjutant
+	pylint tests
 
 pytest:
-	# TODO testing
+	pytest tests --cov=adjutant -m "not slowtest"
+
+pytest_include_slow:
+	pytest tests --cov=adjutant
 
 docs:
 	# TODO docs
