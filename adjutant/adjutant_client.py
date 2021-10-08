@@ -1,11 +1,11 @@
 """Contains the Adjutant Discord client class."""
 
-from typing import Callable, Optional
+from typing import Optional
 import logging
 from logging import INFO
 import json
 from json.decoder import JSONDecodeError
-from multiprocessing import Process
+from subprocess import Popen
 import wandb
 from wandb.apis.public import Run
 import discord
@@ -22,7 +22,7 @@ class Adjutant(discord.Client):
     _wandb_api: wandb.Api
     _wandb_entity: str
     _wandb_project_title: str
-    _run_experiment_fn: Optional[Callable[[dict], None]]
+    _run_experiment_script: Optional[str]
     channel_name: str
     channel: Optional[TextChannel]
     _reported_runs: set[Run]
@@ -31,8 +31,7 @@ class Adjutant(discord.Client):
             self,
             wandb_entity: str,
             wandb_project_title: str,
-            run_experiment_fn: Optional[
-                Callable[[dict], None]] = None,
+            run_experiment_script: Optional[str] = None,
             channel_name: str = 'general',
             *args,
             **kwargs) -> None:
@@ -42,17 +41,18 @@ class Adjutant(discord.Client):
             under which exists the project.
         :param wandb_project_title: The title of the project on WandB to which
             to supply updates on Discord.
-        :param run_experiment_fn: Runs a new experiment with the given
-            hyperparameters. This function may also request another entity, e.g.
-            Kubernetes, to initiate the experiment on its behalf rather than
-            actually running the experiment itself.
+        :param run_experiment_script: The filename of an executable script that
+            runs a new experiment with the given hyperparameters as a
+            JSON-formatted command line argument. This script may also request
+            another entity, e.g. Kubernetes, to initiate the experiment on its
+            behalf rather than actually running the experiment itself.
         :param channel_name: The name of the channel in which to post updates.
         """
         super().__init__(*args, **kwargs)
         self._wandb_api = wandb.Api()
         self._wandb_entity = wandb_entity
         self._wandb_project_title = wandb_project_title
-        self._run_experiment_fn = run_experiment_fn
+        self._run_experiment_script = run_experiment_script
         self.channel_name = channel_name
         self.channel = None
         self._reported_runs = self._get_project_runs()
@@ -130,13 +130,8 @@ class Adjutant(discord.Client):
         :param hyperparams: The hyperparameters to pass to the experiment
             function.
         """
-        #proc = Process(name='adjutant-experiment',
-        #               target=self._run_experiment_fn,
-        #               args=(hyperparams,))
-        #proc.start()
-        from subprocess import Popen
-        #Popen(['python', 'examples/mnist/mnist_model.py'])
-        Popen(['make', 'run_example_mnist_model'])
+        #Popen(['make', 'run_example_mnist_model'])
+        Popen([self._run_experiment_script, f'\'{json.dumps(hyperparams)}\''])
 
     async def on_message(self, message: Message) -> None:
         """Runs every time a message is posted (including by this bot). Responds
@@ -150,8 +145,8 @@ class Adjutant(discord.Client):
         if message.content.startswith(COMMAND_HELLO):
             await self.channel.send('Hello!')
         elif message.content.startswith(COMMAND_EXPERIMENT):
-            if not self._run_experiment_fn:
-                await self.channel.send('No experiment function provided; '
+            if not self._run_experiment_script:
+                await self.channel.send('No experiment script provided; '
                                         'cannot launch experiment.')
             else:
                 hyperparams = Adjutant._get_hyperparams(message.content)

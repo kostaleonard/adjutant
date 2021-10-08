@@ -147,7 +147,14 @@ def run_experiment(hyperparams: dict) -> None:
 
 def main() -> None:
     """Runs the program."""
-    run_experiment({})
+    # TODO put arg parser in its own function.
+    import argparse
+    parser = argparse.ArgumentParser()
+    parser.add_argument('hyperparams', nargs='?')
+    args = parser.parse_args()
+    hyperparams = args.hyperparams if args.hyperparams else {}
+    print(hyperparams)
+    #run_experiment(hyperparams)
 
 
 if __name__ == '__main__':

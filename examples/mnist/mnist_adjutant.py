@@ -4,10 +4,11 @@ import os
 import logging
 # TODO these imports will probably need to change if someone has pip installed adjutant
 from adjutant.adjutant_client import Adjutant
-from examples.mnist.mnist_model import WANDB_PROJECT_TITLE, run_experiment
+from mnist_model import WANDB_PROJECT_TITLE
 
 WANDB_ENTITY = 'kostaleonard'
 DISCORD_TOKEN_ENVIRONMENT_VAR = 'DISCORD_ADJ_TOKEN'
+RUN_EXPERIMENT_SCRIPT = './run_experiment.sh'
 
 
 def main() -> None:
@@ -15,7 +16,7 @@ def main() -> None:
     logging.basicConfig(level=logging.INFO)
     adj = Adjutant(WANDB_ENTITY,
                    WANDB_PROJECT_TITLE,
-                   run_experiment_fn=run_experiment)
+                   run_experiment_script=RUN_EXPERIMENT_SCRIPT)
     adj.run(os.environ[DISCORD_TOKEN_ENVIRONMENT_VAR])
 
 
