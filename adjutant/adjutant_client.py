@@ -136,7 +136,12 @@ class Adjutant(discord.Client):
         if message.content.startswith(COMMAND_HELLO):
             await self.channel.send('Hello!')
         elif message.content.startswith(COMMAND_EXPERIMENT):
-            hyperparams = Adjutant._get_hyperparams(message.content)
-            await self.channel.send(
-                f'Running new experiment with the following hyperparameters.\n'
-                f'{json.dumps(hyperparams, indent=4)}')
+            if not self.run_experiment_fn:
+                await self.channel.send('No experiment function provided; '
+                                        'cannot launch experiment.')
+            else:
+                hyperparams = Adjutant._get_hyperparams(message.content)
+                await self.channel.send(
+                    f'Running new experiment with the following '
+                    f'hyperparameters.\n{json.dumps(hyperparams, indent=4)}')
+                self.run_experiment_fn(hyperparams)
