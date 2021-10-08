@@ -152,9 +152,10 @@ def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument('hyperparams', nargs='?')
     args = parser.parse_args()
-    hyperparams = args.hyperparams if args.hyperparams else {}
+    import json
+    hyperparams = json.loads(args.hyperparams) if args.hyperparams else {}
     print(hyperparams)
-    #run_experiment(hyperparams)
+    run_experiment(hyperparams)
 
 
 if __name__ == '__main__':
