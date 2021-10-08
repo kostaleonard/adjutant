@@ -4,24 +4,10 @@ import os
 import logging
 # TODO these imports will probably need to change if someone has pip installed adjutant
 from adjutant.adjutant_client import Adjutant
-from examples.mnist.mnist_model import WANDB_PROJECT_TITLE
+from examples.mnist.mnist_model import WANDB_PROJECT_TITLE, run_experiment
 
 WANDB_ENTITY = 'kostaleonard'
 DISCORD_TOKEN_ENVIRONMENT_VAR = 'DISCORD_ADJ_TOKEN'
-
-
-# TODO this should be in the model file
-def run_experiment(hyperparams: dict) -> None:
-    """Trains a new model with the given hyperparameters.
-
-    :param hyperparams: The hyperparameters to use in model creation and
-        training.
-    """
-    # TODO actually run experiment.
-    import time
-    print('Simulating a long running experiment')
-    time.sleep(20)
-    print('Experiment complete')
 
 
 def main() -> None:

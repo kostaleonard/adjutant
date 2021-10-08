@@ -130,9 +130,13 @@ class Adjutant(discord.Client):
         :param hyperparams: The hyperparameters to pass to the experiment
             function.
         """
-        proc = Process(target=self._run_experiment_fn,
-                       args=(hyperparams,))
-        proc.start()
+        #proc = Process(name='adjutant-experiment',
+        #               target=self._run_experiment_fn,
+        #               args=(hyperparams,))
+        #proc.start()
+        from subprocess import Popen
+        #Popen(['python', 'examples/mnist/mnist_model.py'])
+        Popen(['make', 'run_example_mnist_model'])
 
     async def on_message(self, message: Message) -> None:
         """Runs every time a message is posted (including by this bot). Responds

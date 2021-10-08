@@ -132,17 +132,22 @@ def eval_model(model: Model, x_test: np.ndarray, y_test: np.ndarray) -> float:
     return model.evaluate(x=x_test, y=y_test, return_dict=True)['accuracy']
 
 
-def main() -> None:
-    """Runs the program."""
+def run_experiment(hyperparams: dict) -> None:
+    """Trains a new model with the given hyperparameters.
+
+    :param hyperparams: The hyperparameters to use in model creation and
+        training.
+    """
     (x_train, y_train), (x_test, y_test) = get_dataset()
-    model = get_model()
-    train_args = {
-        'use_wandb': True,
-        'tensorboard_logdir': DEFAULT_TENSORBOARD_LOGDIR,
-        'model_checkpoint_filename': DEFAULT_MODEL_CHECKPOINT_FILENAME}
-    _ = train_model(model, x_train, y_train, train_args=train_args)
+    model = get_model(hyperparams)
+    _ = train_model(model, x_train, y_train, train_args=hyperparams)
     test_acc = eval_model(model, x_test, y_test)
     print('Test accuracy: {0}'.format(test_acc))
+
+
+def main() -> None:
+    """Runs the program."""
+    run_experiment({})
 
 
 if __name__ == '__main__':
