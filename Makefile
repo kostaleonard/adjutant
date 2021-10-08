@@ -15,6 +15,11 @@ pytest:
 docs:
 	# TODO docs
 
+package_test:
+	rm -rf dist
+	python3 -m build
+	python3 -m twine upload --repository testpypi dist/*
+
 run_example_mnist_adjutant:
 	# Examples are run from their own directories, not project root.
 	cd examples/mnist && PYTHONPATH=../.. python mnist_adjutant.py

@@ -1,4 +1,5 @@
-"""adjutant is a package for managing ML experiments over Discord."""
+"""adjutant is a package for managing ML experiments over Discord in conjunction
+with WandB."""
 
 # TODO test that this works correctly with pip install
 

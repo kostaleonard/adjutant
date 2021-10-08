@@ -1,6 +1,6 @@
 # adjutant
 
-`adjutant` is a package for managing ML experiments over Discord.
+`adjutant` is a package for managing ML experiments over Discord in conjunction with WandB.
 
 ## Installation
 
