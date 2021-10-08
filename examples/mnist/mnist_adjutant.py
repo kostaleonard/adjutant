@@ -2,8 +2,7 @@
 
 import os
 import logging
-# TODO these imports will probably need to change if someone has pip installed adjutant
-from adjutant.adjutant_client import Adjutant
+from adjutant import Adjutant
 from mnist_model import WANDB_PROJECT_TITLE
 
 WANDB_ENTITY = 'kostaleonard'
