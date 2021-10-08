@@ -95,7 +95,7 @@ class Adjutant(discord.Client):
         """Checks WandB for new runs for this project and posts the results of
         those runs."""
         runs = self._get_project_runs()
-        # TODO only report new runs
+        # TODO only report new runs, show run stats and loss curve
         await self.channel.send(f'Found {len(runs)} runs for project '
                                 f'{self._wandb_entity}/'
                                 f'{self._wandb_project_title}.')
