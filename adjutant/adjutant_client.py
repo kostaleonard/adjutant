@@ -72,6 +72,7 @@ class Adjutant(discord.Client):
 
         :return: The set of all Runs for this project.
         """
+        self._wandb_api.flush()
         runs = self._wandb_api.runs(
             f'{self._wandb_entity}/{self._wandb_project_title}')
         return set(runs)
@@ -84,6 +85,7 @@ class Adjutant(discord.Client):
         await self.channel.send(
             f'Adjutant starting! Found {len(self._reported_runs)} runs for '
             f'project {self._wandb_entity}/{self._wandb_project_title}.')
+        # TODO report run with best validation loss
 
     @tasks.loop(seconds=SECONDS_BETWEEN_WANDB_CHECKS)
     async def check_wandb_for_new_runs(self) -> None:

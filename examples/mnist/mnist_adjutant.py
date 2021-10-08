@@ -2,7 +2,7 @@
 
 import os
 import logging
-# TODO these imports will probably need to change if someone has pip installed
+# TODO these imports will probably need to change if someone has pip installed adjutant
 from adjutant.adjutant_client import Adjutant
 from examples.mnist.mnist_model import WANDB_PROJECT_TITLE
 

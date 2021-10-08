@@ -17,3 +17,6 @@ docs:
 
 run_example_mnist_adjutant:
 	PYTHONPATH=. python examples/mnist/mnist_adjutant.py
+
+run_example_mnist_model:
+	PYTHONPATH=. python examples/mnist/mnist_model.py
