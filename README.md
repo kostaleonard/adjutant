@@ -36,21 +36,22 @@ client.run('my-discord-token')
 
 ### `adjutant` with experiment launching
 
-By providing a `run_experiment_fn` constructor argument, `adjutant` will be able to respond to user requests on Discord to run a new experiment. By default, `adjutant` will execute `run_experiment_fn` in a subprocess so that it can still respond to new requests. `run_experiment_fn` may also request another entity, e.g. Kubernetes, to initiate the experiment on its behalf rather than actually running the experiment itself.
+By providing a `run_experiment_script` constructor argument, `adjutant` will be able to respond to user requests on Discord to run a new experiment. By default, `adjutant` will execute `run_experiment_script` in a subprocess so that it can still respond to new requests. `run_experiment_script` may also request another entity, e.g. Kubernetes, to initiate the experiment on its behalf rather than actually running the experiment itself.
+
+
+First, here are the contents of `run_experiment.sh`, which takes a JSON-formatted string as its command line argument. `adjutant` will pass this script the hyperparameters with which to run the experiment. In this script, `train_model.py` trains a new model with the supplied hyperparameters. For an example of what the training script might look like, see [the mnist example](examples/mnist).
+
+```bash
+#!/bin/bash
+python train_model.py "$1"
+```
+
+Now we can create a client that references `run_experiment.sh`.
 
 ```python
 from adjutant import Adjutant
-
-
-def run_experiment_fn(hyperparams: dict[str, Any]) -> None:
-    """Runs a new experiment with the given hyperparameters.
-    
-    :param hyperparams: The hyperparameters to use for the experiment.
-    """
-    src
-
 client = Adjutant('my-wandb-entity',
                   'my-wandb-project-title',
-                  run_experiment_fn=run_experiment_fn)
+                  run_experiment_script='run_experiment.sh')
 client.run('my-discord-token')
 ```
