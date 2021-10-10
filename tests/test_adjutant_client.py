@@ -2,7 +2,7 @@
 # pylint: disable=protected-access
 
 import os
-import time
+from multiprocessing import Process
 import json
 import pytest
 from discord.channel import TextChannel
@@ -12,7 +12,7 @@ from tests.apis import is_discord_config_present, is_wandb_config_present
 
 WANDB_ENTITY = 'kostaleonard'
 DISCORD_TOKEN_ENVIRONMENT_VAR = 'DISCORD_ADJ_TOKEN'
-SETUP_TIMEOUT_SECONDS = 5
+SETUP_TIMEOUT_SECONDS = 20
 NUM_KNOWN_PROJECT_RUNS = 60
 TEST_EXPERIMENT_SCRIPT = os.path.join('tests', 'write_arg.sh')
 TEST_EXPERIMENT_OUTPUT_FILE = os.path.join('/', 'tmp', 'adj_write_arg_out.txt')
@@ -26,18 +26,26 @@ def test_adjutant_init_sets_public_fields() -> None:
     assert adj.channel_name
 
 
+# TODO typing, docstring
+def _run_client(client, token):
+    client.run(token)
+
+
 @pytest.mark.slowtest
-def test_adjutant_get_channel_finds_discord_channel() -> None:
+@pytest.mark.asyncio
+async def test_adjutant_get_channel_finds_discord_channel() -> None:
     """Tests that Adjutant._get_channel finds a valid channel on Discord."""
     if not is_discord_config_present():
         return
     adj = adjutant_client.Adjutant(WANDB_ENTITY, WANDB_PROJECT_TITLE)
-    seconds_waited = 0
-    while not adj.is_ready() and seconds_waited < SETUP_TIMEOUT_SECONDS:
-        time.sleep(1)
-        seconds_waited += 1
+    # TODO use aioprocessing module to run adj.run(token) in background
+    proc = Process(target=_run_client,
+                   args=(adj, os.environ[DISCORD_TOKEN_ENVIRONMENT_VAR]))
+    proc.start()
+    await adj.wait_until_ready()
     assert adj.is_ready()
     assert isinstance(adj.channel, TextChannel)
+    proc.terminate()
 
 
 def test_adjutant_get_project_runs_finds_project_runs() -> None:
@@ -57,14 +65,24 @@ def test_adjutant_get_hyperparams_empty_str() -> None:
 def test_adjutant_get_hyperparams_bad_json() -> None:
     """Tests that Adjutant._get_hyperparams returns an empty dict when the input
     is improperly formatted."""
-    assert adjutant_client.Adjutant._get_hyperparams('{"hello: 1}') == {}
+    assert adjutant_client.Adjutant._get_hyperparams(
+        adjutant_client.COMMAND_EXPERIMENT +
+        ' {"hello: 1}') == {}
+
+
+def test_adjutant_get_hyperparams_no_command() -> None:
+    """Tests that Adjutant._get_hyperparams returns an empty dict when the input
+    does not contain the COMMAND_EXPERIMENT string as a start sequence."""
+    assert adjutant_client.Adjutant._get_hyperparams(
+        '{"hello": 1, "world": "abc"}') == {}
 
 
 def test_adjutant_get_hyperparams_valid_json() -> None:
     """Tests that Adjutant._get_hyperparams returns the correct dict when the
     input represents valid JSON."""
     assert adjutant_client.Adjutant._get_hyperparams(
-        '{"hello": 1, "world": "abc"}') == {"hello": 1, "world": "abc"}
+        adjutant_client.COMMAND_EXPERIMENT +
+        ' {"hello": 1, "world": "abc"}') == {"hello": 1, "world": "abc"}
 
 
 def test_adjutant_run_experiment_runs_command() -> None:
