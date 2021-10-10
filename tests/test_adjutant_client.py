@@ -1,4 +1,5 @@
 """Tests adjutant_client.py."""
+# pylint: disable=protected-access
 
 import os
 import time
@@ -82,7 +83,7 @@ def test_adjutant_run_experiment_runs_command() -> None:
         pass
     adj.run_experiment(hyperparams)
     assert os.path.exists(TEST_EXPERIMENT_OUTPUT_FILE)
-    with open(TEST_EXPERIMENT_OUTPUT_FILE, 'r') as infile:
+    with open(TEST_EXPERIMENT_OUTPUT_FILE, 'r', encoding='utf-8') as infile:
         contents = infile.read()
     os.remove(TEST_EXPERIMENT_OUTPUT_FILE)
     assert json.loads(contents) == hyperparams

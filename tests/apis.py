@@ -19,7 +19,7 @@ def is_wandb_config_present() -> bool:
     if not os.path.exists(WANDB_KEY_FILE) and WANDB_KEY_VAR not in os.environ:
         # No API key file.
         return False
-    with open(WANDB_KEY_FILE, 'r') as infile:
+    with open(WANDB_KEY_FILE, 'r', encoding='utf-8') as infile:
         if 'api.wandb.ai' not in infile.read():
             # No wandb entry found in key file.
             return False

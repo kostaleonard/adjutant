@@ -2,7 +2,6 @@
 
 from typing import Optional
 import logging
-from logging import INFO
 import json
 from json.decoder import JSONDecodeError
 from subprocess import Popen
@@ -31,9 +30,9 @@ class Adjutant(discord.Client):
             self,
             wandb_entity: str,
             wandb_project_title: str,
+            *args,
             run_experiment_script: Optional[str] = None,
             channel_name: str = 'general',
-            *args,
             **kwargs) -> None:
         """Instantiates the object.
 
@@ -56,6 +55,7 @@ class Adjutant(discord.Client):
         self.channel_name = channel_name
         self.channel = None
         self._reported_runs = self._get_project_runs()
+        # pylint: disable=no-member
         self.check_wandb_for_new_runs.start()
 
     def _get_channel(self) -> Optional[TextChannel]:
@@ -83,19 +83,17 @@ class Adjutant(discord.Client):
     async def on_ready(self) -> None:
         """Runs once the client has successfully logged in. Logs the event and
         sets self.channel to the one requested by the user."""
-        logging.log(INFO, f'Logged in as {self.user.name}, {self.user.id}')
+        logging.info('Logged in as %s, %s', self.user.name, self.user.id)
         self.channel = self._get_channel()
         await self.channel.send(
             f'Adjutant starting! Found {len(self._reported_runs)} runs for '
             f'project {self._wandb_entity}/{self._wandb_project_title}.')
-        # TODO report run with best validation loss
 
     @tasks.loop(seconds=SECONDS_BETWEEN_WANDB_CHECKS)
     async def check_wandb_for_new_runs(self) -> None:
         """Checks WandB for new runs for this project and posts the results of
         those runs."""
         runs = self._get_project_runs()
-        # TODO only report when there are new runs, show run stats and loss curve
         await self.channel.send(f'Found {len(runs)} runs for project '
                                 f'{self._wandb_entity}/'
                                 f'{self._wandb_project_title}.')
@@ -130,6 +128,8 @@ class Adjutant(discord.Client):
         :param hyperparams: The hyperparameters to pass to the experiment
             function.
         """
+        # We don't use the context manager because it waits for the subprocess.
+        # pylint: disable=consider-using-with
         Popen([self._run_experiment_script, json.dumps(hyperparams)])
 
     async def on_message(self, message: Message) -> None:
