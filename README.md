@@ -1,72 +1,57 @@
-# Adjutant
+# adjutant
 
-A package for delivering updates on long-running software tasks over Discord, Slack, and other platforms.
+`adjutant` is a package for managing ML experiments over Discord in conjunction with WandB.
 
-# Installation
+## Installation
 
 ```bash
 pip install adjutant
 ```
 
-# Examples
+### Discord bot creation
 
-## Post a message
+To allow `adjutant` to post to discord as a bot, first follow [these instructions](https://discordpy.readthedocs.io/en/stable/discord.html) for creating a Discord bot and adding it to your Server. You then create an `Adjutant` object with your bot token.
+
+**Note: Be careful not to share your bot's token. Consider storing it in an environment variable or file that is not checked in to version control.**
+
+### WandB setup
+
+`adjutant` is designed to work with WandB for ML experiment tracking. Create a WandB account at [wandb.ai](https://wandb.ai/).
+
+Wherever you plan to run `adjutant`, make sure you are either logged in to your WandB account, or have an API key populated in the `WAND_API_KEY` environment variable. More information is available in [the WandB docs](https://docs.wandb.ai/guides/track/public-api-guide).
+
+## Examples
+
+For more advanced examples, please see [examples](examples), starting with [the MNIST example](examples/mnist).
+
+### Basic `adjutant`
+
+The most basic formulation of `adjutant` provides updates on WandB experiments under the given project name. Your WandB entity name is your account name, and the project title is the name of the project you have created (or will create) to store experiments.
 
 ```python
-import adjutant
-adjutant.post('Hello, world!')
+from adjutant import Adjutant
+client = Adjutant('my-wandb-entity', 'my-wandb-project-title')
+client.run('my-discord-token')
 ```
 
-## Post an image
+### `adjutant` with experiment launching
 
-```python
-import adjutant
-adjutant.post('My image caption.', image_filename='my_image.png')
+By providing a `run_experiment_script` constructor argument, `adjutant` will be able to respond to user requests on Discord to run a new experiment. By default, `adjutant` will execute `run_experiment_script` in a subprocess so that it can still respond to new requests. `run_experiment_script` may also request another entity, e.g. Kubernetes, to initiate the experiment on its behalf rather than actually running the experiment itself.
+
+
+First, here are the contents of `run_experiment.sh`, which takes a JSON-formatted string as its command line argument. `adjutant` will pass this script the hyperparameters with which to run the experiment. In this script, `train_model.py` trains a new model with the supplied hyperparameters. For an example of what the training script might look like, see [the mnist example](examples/mnist).
+
+```bash
+#!/bin/bash
+python train_model.py "$1"
 ```
 
-## As a TensorFlow Callback
-
-By default, `AdjutantCallback()` will create a callback that posts the training and (if available) validation metrics after every epoch. Optional arguments allow it to post arbitrary data, e.g., input samples (as images, raw text, CSV data, etc.), misclassified training samples, the loss curve, neural network output (generated images, text, etc.).
+Now we can create a client that references `run_experiment.sh`.
 
 ```python
-import tensorflow as tf
-from adjutant.keras import AdjutantCallback
-
-callbacks = [AdjutantCallback()]
-
-# TODO add MNIST model
-model = tf.keras.models.Sequential([
-    tf.keras.layers.Flatten(input_shape=(28, 28)),
-    tf.keras.layers.Dense(128, activation='relu'),
-    tf.keras.layers.Dense(10, activation='softmax')])
-model.compile(
-    optimizer='adam',
-    loss='categorical_crossentropy',
-    metrics=['accuracy'])
-model.fit(
-    x=x_train,
-    y=y_train,
-    batch_size=32,
-    epochs=10,
-    validation_split=0.2,
-    callbacks=callbacks)
-```
-
-## Request ML model prediction on an input
-
-`AdjutantPredictor()` takes as an argument a function that transforms an input tensor of several samples into any output.
-
-```python
-import random
-from adjutant.keras import AdjutantPredictor
-
-def prediction_function(input_tensor: np.ndarray) -> str:
-    # Prediction logic goes here.
-    if random.random() < 0.5:
-        return 'This is NOT an image of a dog.'
-    return 'This is an image of a dog.'
-
-predictor = AdjutantPredictor(prediction_function)
-while True:
-    predictor.handle_request()
+from adjutant import Adjutant
+client = Adjutant('my-wandb-entity',
+                  'my-wandb-project-title',
+                  run_experiment_script='run_experiment.sh')
+client.run('my-discord-token')
 ```
