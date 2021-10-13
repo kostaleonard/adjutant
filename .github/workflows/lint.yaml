@@ -1,0 +1,9 @@
+name: lint
+on: [push]
+jobs:
+  run-pylint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - run: make install
+      - run: make pylint
