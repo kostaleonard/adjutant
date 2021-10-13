@@ -2,10 +2,7 @@
 # pylint: disable=protected-access
 
 import os
-from multiprocessing import Process
 import json
-import pytest
-from discord.channel import TextChannel
 from adjutant import adjutant_client
 from examples.mnist.mnist_model import WANDB_PROJECT_TITLE
 from tests.apis import is_discord_config_present, is_wandb_config_present
@@ -24,28 +21,6 @@ def test_adjutant_init_sets_public_fields() -> None:
         return
     adj = adjutant_client.Adjutant(WANDB_ENTITY, WANDB_PROJECT_TITLE)
     assert adj.channel_name
-
-
-# TODO typing, docstring
-def _run_client(client, token):
-    client.run(token)
-
-
-@pytest.mark.slowtest
-@pytest.mark.asyncio
-async def test_adjutant_get_channel_finds_discord_channel() -> None:
-    """Tests that Adjutant._get_channel finds a valid channel on Discord."""
-    if not is_discord_config_present():
-        return
-    adj = adjutant_client.Adjutant(WANDB_ENTITY, WANDB_PROJECT_TITLE)
-    # TODO use aioprocessing module to run adj.run(token) in background
-    proc = Process(target=_run_client,
-                   args=(adj, os.environ[DISCORD_TOKEN_ENVIRONMENT_VAR]))
-    proc.start()
-    await adj.wait_until_ready()
-    assert adj.is_ready()
-    assert isinstance(adj.channel, TextChannel)
-    proc.terminate()
 
 
 def test_adjutant_get_project_runs_finds_project_runs() -> None:
