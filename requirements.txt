@@ -1,6 +1,6 @@
 pytest
 pytest-cov
-pylint==2.11.1
+pylint
 discord.py==1.7.3
 wandb==0.12.1
 numpy==1.19.5
