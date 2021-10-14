@@ -21,7 +21,7 @@ jobs:
       uses: actions/upload-artifact@v2
       with:
         name: docs
-        path: docs/build/html
+        path: docs/_build/html
   deploy:
     runs-on: ubuntu-latest
     steps:

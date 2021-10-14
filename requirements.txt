@@ -5,3 +5,5 @@ discord.py==1.7.3
 wandb==0.12.1
 numpy==1.19.5
 tensorflow
+sphinx
+sphinx_rtd_theme
