@@ -27,7 +27,7 @@ Once Adjutant is running and has connected to Discord (see [the Basic Adjutant e
 | Command | Effect | Example |
 | - | - | - |
 | $hello | Get a response from the bot | $hello |
-| $experiment {hyperparams} | Launch a new experiment with the given hyperparameters | $experiment {"epochs": 10, "batch_size": 32} |
+| $experiment {hyperparams} | Launch a new experiment with the given hyperparameters (must provide `run_experiment_script` in constructor) | $experiment {"epochs": 10, "batch_size": 32} |
 
 ## Quickstart
 
