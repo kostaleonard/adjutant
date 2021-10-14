@@ -32,6 +32,11 @@ def test_adjutant_get_project_runs_finds_project_runs() -> None:
     assert len(runs) >= NUM_KNOWN_PROJECT_RUNS
 
 
+def test_adjutant_get_run_with_best_val_loss_finds_best_run() -> None:
+    """Tests that Adjutant._get_run_with_best_val_loss finds the run with the
+    best validation loss."""
+
+
 def test_adjutant_get_hyperparams_empty_str() -> None:
     """Tests Adjutant._get_hyperparams on the empty string."""
     assert adjutant_client.Adjutant._get_hyperparams('') == {}

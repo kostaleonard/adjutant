@@ -1,6 +1,6 @@
 """Contains the Adjutant Discord client class."""
 
-from typing import Optional
+from typing import Optional, Any
 import logging
 import json
 from json.decoder import JSONDecodeError
@@ -79,6 +79,14 @@ class Adjutant(discord.Client):
         runs = self._wandb_api.runs(
             f'{self._wandb_entity}/{self._wandb_project_title}')
         return set(runs)
+
+    def _get_run_with_best_val_loss(self, runs: set[Run]) -> Run:
+        """Returns the Run with the best (i.e., lowest) validation loss.
+
+        :param runs: The set of Runs to filter.
+        :return: The Run with the best (i.e., lowest) validation loss.
+        """
+        # TODO
 
     async def on_ready(self) -> None:
         """Runs once the client has successfully logged in. Logs the event and
