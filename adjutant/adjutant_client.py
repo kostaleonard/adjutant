@@ -113,6 +113,7 @@ class Adjutant(discord.Client):
         new_runs = self._reported_runs.difference(new_runs)
         for run in new_runs:
             best_val_loss = run.summary.get('best_val_loss', np.inf)
+            # TODO attach loss figure
             await self.channel.send(
                 f'Run {run.name} finished! Best val loss: {best_val_loss:.3f}\n'
                 f'Link to run: {run.url}')
