@@ -16,8 +16,11 @@ pytest:
 pytest_include_slow:
 	pytest tests --cov=adjutant
 
-docs:
-	# TODO docs
+documentation:
+	cd docs && make html
+
+package_prod:
+	# TODO upload to pypi actual
 
 package_test:
 	rm -rf dist
