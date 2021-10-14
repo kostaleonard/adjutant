@@ -80,7 +80,8 @@ class Adjutant(discord.Client):
             f'{self._wandb_entity}/{self._wandb_project_title}')
         return set(runs)
 
-    def _get_run_with_best_val_loss(self, runs: set[Run]) -> Run:
+    @staticmethod
+    def _get_run_with_best_val_loss(runs: set[Run]) -> Run:
         """Returns the Run with the best (i.e., lowest) validation loss.
 
         :param runs: The set of Runs to filter.

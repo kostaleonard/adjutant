@@ -3,6 +3,7 @@
 
 import os
 import json
+import pytest
 from adjutant import adjutant_client
 from examples.mnist.mnist_model import WANDB_PROJECT_TITLE
 from tests.apis import is_discord_config_present, is_wandb_config_present
@@ -13,6 +14,7 @@ SETUP_TIMEOUT_SECONDS = 20
 NUM_KNOWN_PROJECT_RUNS = 60
 TEST_EXPERIMENT_SCRIPT = os.path.join('tests', 'write_arg.sh')
 TEST_EXPERIMENT_OUTPUT_FILE = os.path.join('/', 'tmp', 'adj_write_arg_out.txt')
+KNOWN_BEST_VAL_LOSS = 0.08257
 
 
 def test_adjutant_init_sets_public_fields() -> None:
@@ -35,6 +37,19 @@ def test_adjutant_get_project_runs_finds_project_runs() -> None:
 def test_adjutant_get_run_with_best_val_loss_finds_best_run() -> None:
     """Tests that Adjutant._get_run_with_best_val_loss finds the run with the
     best validation loss."""
+    if not is_discord_config_present() or not is_wandb_config_present():
+        return
+    adj = adjutant_client.Adjutant(WANDB_ENTITY, WANDB_PROJECT_TITLE)
+    runs = adj._get_project_runs()
+    best_run = adjutant_client.Adjutant._get_run_with_best_val_loss(runs)
+    assert best_run.summary['best_val_loss'] <= KNOWN_BEST_VAL_LOSS
+
+
+def test_adjutant_get_run_with_best_val_loss_raises_error_empty_input() -> None:
+    """Tests that Adjutant._get_run_with_best_val_loss raises an error when the
+    input is empty."""
+    with pytest.raises(ValueError):
+        _ = adjutant_client.Adjutant._get_run_with_best_val_loss(set())
 
 
 def test_adjutant_get_hyperparams_empty_str() -> None:
