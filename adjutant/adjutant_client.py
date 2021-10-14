@@ -5,6 +5,7 @@ import logging
 import json
 from json.decoder import JSONDecodeError
 from subprocess import Popen
+import numpy as np
 import wandb
 from wandb.apis.public import Run
 import discord
@@ -87,16 +88,21 @@ class Adjutant(discord.Client):
         :param runs: The set of Runs to filter.
         :return: The Run with the best (i.e., lowest) validation loss.
         """
+        runs = filter(lambda run: 'best_val_loss' in run.summary, runs)
         return min(runs, key=lambda run: run.summary['best_val_loss'])
 
     async def on_ready(self) -> None:
         """Runs once the client has successfully logged in. Logs the event and
         sets self.channel to the one requested by the user."""
         logging.info('Logged in as %s, %s', self.user.name, self.user.id)
+        best_run = Adjutant._get_run_with_best_val_loss(self._reported_runs)
+        best_val_loss = best_run.summary.get('best_val_loss', np.inf)
         self.channel = self._get_channel()
         await self.channel.send(
             f'Adjutant starting! Found {len(self._reported_runs)} runs for '
-            f'project {self._wandb_entity}/{self._wandb_project_title}.')
+            f'project {self._wandb_entity}/{self._wandb_project_title}.\n'
+            f'Best run: {best_run.name}, best val loss: {best_val_loss:.3f}\n'
+            f'Link to run: {best_run.url}')
 
     @tasks.loop(seconds=SECONDS_BETWEEN_WANDB_CHECKS)
     async def check_wandb_for_new_runs(self) -> None:

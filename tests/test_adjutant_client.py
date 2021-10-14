@@ -52,9 +52,9 @@ def test_adjutant_get_run_with_best_val_loss_no_val_loss_key() -> None:
     if not is_discord_config_present() or not is_wandb_config_present():
         return
     adj = adjutant_client.Adjutant(WANDB_ENTITY, WANDB_PROJECT_TITLE)
-    runs = list(adj._get_project_runs())
-    del runs[0].summary['best_val_loss']
-    best_run = adjutant_client.Adjutant._get_run_with_best_val_loss(set(runs))
+    runs = adj._get_project_runs()
+    assert any('best_val_loss' not in run.summary for run in runs)
+    best_run = adjutant_client.Adjutant._get_run_with_best_val_loss(runs)
     assert isinstance(best_run, Run)
 
 
@@ -96,6 +96,7 @@ def test_adjutant_get_hyperparams_valid_json() -> None:
 def test_adjutant_run_experiment_runs_command() -> None:
     """Tests that Adjutant.run_experiment runs the specified command with the
     hyperparameter JSON string as the argument."""
+    # TODO this fails sometimes
     if not is_discord_config_present():
         return
     adj = adjutant_client.Adjutant(
