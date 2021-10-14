@@ -122,7 +122,6 @@ class Adjutant(discord.Client):
             run = runs[run_name]
             self._reported_runs[run_name] = run
             best_val_loss = run.summary.get('best_val_loss', np.inf)
-            # TODO attach loss figure
             await self.channel.send(
                 f'Run {run.name} finished! Best val loss: {best_val_loss:.3f}\n'
                 f'Link to run: {run.url}')
