@@ -79,6 +79,7 @@ class Adjutant(discord.Client):
         self._wandb_api.flush()
         runs = self._wandb_api.runs(
             f'{self._wandb_entity}/{self._wandb_project_title}')
+        runs = filter(lambda run: run.is_complete(), runs)
         return set(runs)
 
     @staticmethod

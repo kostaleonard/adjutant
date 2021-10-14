@@ -1,5 +1,6 @@
 ### Custom ignored files ###
 .idea/*
+__pycache__
 
 # Created by https://www.toptal.com/developers/gitignore/api/python,pycharm,macos
 # Edit at https://www.toptal.com/developers/gitignore?templates=python,pycharm,macos
