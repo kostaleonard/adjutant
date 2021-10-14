@@ -110,9 +110,13 @@ class Adjutant(discord.Client):
         """Checks WandB for new runs for this project and posts the results of
         those runs."""
         runs = self._get_project_runs()
-        await self.channel.send(f'Found {len(runs)} runs for project '
-                                f'{self._wandb_entity}/'
-                                f'{self._wandb_project_title}.')
+        new_runs = self._reported_runs.difference(new_runs)
+        for run in new_runs:
+            best_val_loss = run.summary.get('best_val_loss', np.inf)
+            await self.channel.send(
+                f'Run {run.name} finished! Best val loss: {best_val_loss:.3f}\n'
+                f'Link to run: {run.url}')
+        self._reported_runs = self._reported_runs.union(new_runs)
 
     @check_wandb_for_new_runs.before_loop
     async def _before_check_wandb_for_new_runs(self) -> None:
