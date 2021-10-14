@@ -96,14 +96,18 @@ class Adjutant(discord.Client):
         """Runs once the client has successfully logged in. Logs the event and
         sets self.channel to the one requested by the user."""
         logging.info('Logged in as %s, %s', self.user.name, self.user.id)
+        best_run_info = ''
         best_run = Adjutant._get_run_with_best_val_loss(self._reported_runs)
-        best_val_loss = best_run.summary.get('best_val_loss', np.inf)
+        if best_run:
+            best_val_loss = best_run.summary.get('best_val_loss', np.inf)
+            best_run_info = (
+                f'Best run: {best_run.name}, best val loss: '
+                f'{best_val_loss:.3f}\nLink to run: {best_run.url}')
         self.channel = self._get_channel()
         await self.channel.send(
             f'Adjutant starting! Found {len(self._reported_runs)} runs for '
             f'project {self._wandb_entity}/{self._wandb_project_title}.\n'
-            f'Best run: {best_run.name}, best val loss: {best_val_loss:.3f}\n'
-            f'Link to run: {best_run.url}')
+            f'{best_run_info}')
 
     @tasks.loop(seconds=SECONDS_BETWEEN_WANDB_CHECKS)
     async def check_wandb_for_new_runs(self) -> None:

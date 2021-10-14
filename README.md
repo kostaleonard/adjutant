@@ -20,7 +20,16 @@ Adjutant is designed to work with WandB for ML experiment tracking. Create a Wan
 
 Wherever you plan to run Adjutant, make sure you are either logged in to your WandB account, or have an API key populated in the `WANDB_API_KEY` environment variable. More information is available in [the WandB docs](https://docs.wandb.ai/guides/track/public-api-guide).
 
-## Examples
+## Adjutant commands
+
+Once Adjutant is running and has connected to Discord (see [the Basic Adjutant example below](#basic-adjutant) to get started), you can send it the following commands by posting in the chat.
+
+| Command | Effect | Example |
+| - | - | - |
+| $hello | Get a response from the bot | $hello |
+| $experiment {hyperparams} | Launch a new experiment with the given hyperparameters | $experiment {"epochs": 10, "batch_size": 32} |
+
+## Quickstart
 
 For more advanced examples, please see [examples](examples), starting with [the MNIST example](examples/mnist).
 
@@ -33,6 +42,8 @@ from adjutant import Adjutant
 client = Adjutant('my-wandb-entity', 'my-wandb-project-title')
 client.run('my-discord-token')
 ```
+
+When you run the script, you will see your bot post to your Discord chat with information on the WandB runs it found for the project.
 
 ### Adjutant with experiment launching
 
