@@ -53,7 +53,7 @@ def test_adjutant_get_run_with_best_val_loss_no_val_loss_key() -> None:
         return
     adj = adjutant_client.Adjutant(WANDB_ENTITY, WANDB_PROJECT_TITLE)
     runs = adj._get_project_runs()
-    assert any('best_val_loss' not in run.summary for run in runs)
+    assert any('best_val_loss' not in run.summary for run in runs.values())
     best_run = adjutant_client.Adjutant._get_run_with_best_val_loss(runs)
     assert isinstance(best_run, Run)
 
@@ -62,7 +62,7 @@ def test_adjutant_get_run_with_best_val_loss_raises_error_empty_input() -> None:
     """Tests that Adjutant._get_run_with_best_val_loss raises an error when the
     input is empty."""
     with pytest.raises(ValueError):
-        _ = adjutant_client.Adjutant._get_run_with_best_val_loss(set())
+        _ = adjutant_client.Adjutant._get_run_with_best_val_loss({})
 
 
 def test_adjutant_get_hyperparams_empty_str() -> None:

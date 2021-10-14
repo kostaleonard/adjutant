@@ -25,7 +25,7 @@ class Adjutant(discord.Client):
     _run_experiment_script: Optional[str]
     channel_name: str
     channel: Optional[TextChannel]
-    _reported_runs: set[Run]
+    _reported_runs: dict[str, Run]
 
     def __init__(
             self,
@@ -71,25 +71,27 @@ class Adjutant(discord.Client):
                 return channel
         return None
 
-    def _get_project_runs(self) -> set[Run]:
-        """Returns the set of all Runs for this project.
+    def _get_project_runs(self) -> dict[str, Run]:
+        """Returns the dict of all Runs for this project. The keys are the names
+        of the runs and the values are the corresponding Run objects.
 
-        :return: The set of all Runs for this project.
+        :return: The dict of all Runs for this project.
         """
         self._wandb_api.flush()
         runs = self._wandb_api.runs(
             f'{self._wandb_entity}/{self._wandb_project_title}')
         runs = filter(lambda run: run.state == 'finished', runs)
-        return set(runs)
+        return {run.name: run for run in runs}
 
     @staticmethod
-    def _get_run_with_best_val_loss(runs: set[Run]) -> Run:
+    def _get_run_with_best_val_loss(runs: dict[str, Run]) -> Run:
         """Returns the Run with the best (i.e., lowest) validation loss.
 
-        :param runs: The set of Runs to filter.
+        :param runs: The dict of Runs to filter. The keys are the names of the
+            runs and the values are the corresponding Run objects.
         :return: The Run with the best (i.e., lowest) validation loss.
         """
-        runs = filter(lambda run: 'best_val_loss' in run.summary, runs)
+        runs = filter(lambda run: 'best_val_loss' in run.summary, runs.values())
         return min(runs, key=lambda run: run.summary['best_val_loss'])
 
     async def on_ready(self) -> None:
@@ -114,14 +116,16 @@ class Adjutant(discord.Client):
         """Checks WandB for new runs for this project and posts the results of
         those runs."""
         runs = self._get_project_runs()
-        new_runs = self._reported_runs.difference(new_runs)
-        for run in new_runs:
+        new_run_names = set(runs.keys()).difference(
+            set(self._reported_runs.keys()))
+        for run_name in new_run_names:
+            run = runs[run_name]
+            self._reported_runs[run_name] = run
             best_val_loss = run.summary.get('best_val_loss', np.inf)
             # TODO attach loss figure
             await self.channel.send(
                 f'Run {run.name} finished! Best val loss: {best_val_loss:.3f}\n'
                 f'Link to run: {run.url}')
-        self._reported_runs = self._reported_runs.union(new_runs)
 
     @check_wandb_for_new_runs.before_loop
     async def _before_check_wandb_for_new_runs(self) -> None:
