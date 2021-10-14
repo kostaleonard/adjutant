@@ -101,6 +101,7 @@ def train_model(model: Model,
     callbacks = []
     if train_args['use_wandb']:
         wandb.init(project=WANDB_PROJECT_TITLE, dir='.')
+        # TODO log the hyperparameters to wandb
         callbacks.append(WandbCallback())
     if train_args['tensorboard_logdir']:
         log_dir = os.path.join(str(train_args['tensorboard_logdir']),

@@ -16,8 +16,13 @@ pytest:
 pytest_include_slow:
 	pytest tests --cov=adjutant
 
-docs:
-	# TODO docs
+documentation:
+	cd docs && make html
+
+package_prod:
+	rm -rf dist
+	python3 -m build
+	python3 -m twine upload dist/*
 
 package_test:
 	rm -rf dist
