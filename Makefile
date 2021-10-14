@@ -20,7 +20,9 @@ documentation:
 	cd docs && make html
 
 package_prod:
-	# TODO upload to pypi actual
+	rm -rf dist
+	python3 -m build
+	python3 -m twine upload dist/*
 
 package_test:
 	rm -rf dist

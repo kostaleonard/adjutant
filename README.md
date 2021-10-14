@@ -5,7 +5,7 @@ Adjutant is a package for managing ML experiments over Discord in conjunction wi
 ## Installation
 
 ```bash
-pip install adjutant
+pip install adjutant-discord
 ```
 
 ### Discord bot creation
