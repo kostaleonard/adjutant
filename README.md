@@ -50,7 +50,7 @@ When you run the script, you will see your bot post to your Discord chat with in
 By providing a `run_experiment_script` constructor argument, Adjutant will be able to respond to user requests on Discord to run a new experiment. Adjutant will execute `run_experiment_script` in a subprocess so that it can still respond to new requests. `run_experiment_script` may also request another entity, e.g. Kubernetes, to initiate the experiment on its behalf rather than actually running the experiment itself.
 
 
-First, here are the contents of `run_experiment.sh`, which takes a JSON-formatted string as its command line argument. Adjutant will pass this script the hyperparameters with which to run the experiment. In this script, `train_model.py` trains a new model with the supplied hyperparameters. For an example of what the training script might look like, see [the mnist example](examples/mnist).
+First, here are the contents of `run_experiment.sh`, which takes a JSON-formatted string as its command line argument. Adjutant will pass this script the hyperparameters with which to run the experiment. In this script, `train_model.py` trains a new model with the supplied hyperparameters. For an example of what the training script might look like, see [the MNIST example](examples/mnist).
 
 ```bash
 #!/bin/bash
