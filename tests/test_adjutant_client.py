@@ -3,6 +3,7 @@
 
 import os
 import json
+import time
 import pytest
 from wandb.apis.public import Run
 from adjutant import adjutant_client
@@ -96,7 +97,6 @@ def test_adjutant_get_hyperparams_valid_json() -> None:
 def test_adjutant_run_experiment_runs_command() -> None:
     """Tests that Adjutant.run_experiment runs the specified command with the
     hyperparameter JSON string as the argument."""
-    # TODO this fails sometimes
     if not is_discord_config_present():
         return
     adj = adjutant_client.Adjutant(
@@ -109,6 +109,8 @@ def test_adjutant_run_experiment_runs_command() -> None:
     except FileNotFoundError:
         pass
     adj.run_experiment(hyperparams)
+    # Wait for the new file to be created.
+    time.sleep(1)
     assert os.path.exists(TEST_EXPERIMENT_OUTPUT_FILE)
     with open(TEST_EXPERIMENT_OUTPUT_FILE, 'r', encoding='utf-8') as infile:
         contents = infile.read()
