@@ -1,6 +1,6 @@
 """Contains the Adjutant Discord client class."""
 
-from typing import Optional, Any
+from typing import Optional
 import logging
 import json
 from json.decoder import JSONDecodeError
@@ -87,7 +87,7 @@ class Adjutant(discord.Client):
         :param runs: The set of Runs to filter.
         :return: The Run with the best (i.e., lowest) validation loss.
         """
-        # TODO
+        return min(runs, key=lambda run: run.summary['best_val_loss'])
 
     async def on_ready(self) -> None:
         """Runs once the client has successfully logged in. Logs the event and

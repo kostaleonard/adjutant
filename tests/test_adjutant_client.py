@@ -4,6 +4,7 @@
 import os
 import json
 import pytest
+from wandb.apis.public import Run
 from adjutant import adjutant_client
 from examples.mnist.mnist_model import WANDB_PROJECT_TITLE
 from tests.apis import is_discord_config_present, is_wandb_config_present
@@ -43,6 +44,18 @@ def test_adjutant_get_run_with_best_val_loss_finds_best_run() -> None:
     runs = adj._get_project_runs()
     best_run = adjutant_client.Adjutant._get_run_with_best_val_loss(runs)
     assert best_run.summary['best_val_loss'] <= KNOWN_BEST_VAL_LOSS
+
+
+def test_adjutant_get_run_with_best_val_loss_no_val_loss_key() -> None:
+    """Tests that Adjutant._get_run_with_best_val_loss still succeeds even when
+    there are runs that don't have a validation loss key."""
+    if not is_discord_config_present() or not is_wandb_config_present():
+        return
+    adj = adjutant_client.Adjutant(WANDB_ENTITY, WANDB_PROJECT_TITLE)
+    runs = list(adj._get_project_runs())
+    del runs[0].summary['best_val_loss']
+    best_run = adjutant_client.Adjutant._get_run_with_best_val_loss(set(runs))
+    assert isinstance(best_run, Run)
 
 
 def test_adjutant_get_run_with_best_val_loss_raises_error_empty_input() -> None:
