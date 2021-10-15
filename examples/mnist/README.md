@@ -2,8 +2,9 @@
 
 ## Files
 
-* `mnist_adjutant.py`: Runs the `adjutant` Discord client.
-* `mnist_model.py`: Trains a new machine learning model on the MNIST dataset, syncing with WandB.
+* [`mnist_adjutant.py`](mnist_adjutant.py): Runs the adjutant Discord client. When run, the script will post to Discord to notify the user of a successful connection.
+* [`mnist_model.py`](mnist_model.py): Trains a new machine learning model on the MNIST dataset, syncing with WandB. Takes at most 1 argument: either a JSON-formatted string representing the hyperparameters, or nothing for the default hyperparameters.
+* [`run_experiment.sh`](run_experiment.sh): Runs `mnist_model.py` with the given hyperparameters. Takes at most 1 argument in the same format as `mnist_model.py`. This script is provided to the adjutant client on creation (see `mnist_adjutant.py`).
 
 ## Usage
 
