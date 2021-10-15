@@ -67,7 +67,7 @@ Now we can create a client that references `run_experiment.sh`.
 from adjutant import Adjutant
 client = Adjutant('my-wandb-entity',
                   'my-wandb-project-title',
-                  run_experiment_script='run_experiment.sh')
+                  run_experiment_script='./run_experiment.sh')
 client.run('my-discord-token')
 ```
 
