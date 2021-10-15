@@ -35,4 +35,4 @@ jobs:
         python -m pip install --upgrade pip
         make install
     - name: Package and upload to PyPI
-      run: make package_prod
+      run: make help #make package_prod
