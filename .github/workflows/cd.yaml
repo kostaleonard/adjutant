@@ -40,5 +40,5 @@ jobs:
         python3 -m build
     - name: Publish to PyPI
       uses: pypa/gh-action-pypi-publish@master
-        with:
-          password: ${{ secrets.PYPI_API_TOKEN }}
+      with:
+        password: ${{ secrets.PYPI_API_TOKEN }}
