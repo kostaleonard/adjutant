@@ -10,7 +10,7 @@
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 #
-# import os
+import os
 # import sys
 # sys.path.insert(0, os.path.abspath('.'))
 
@@ -22,7 +22,9 @@ copyright = '2021, Leo Kosta'
 author = 'Leo Kosta'
 
 # The full version, including alpha/beta/rc tags
-release = 'v0.0.0'
+RELEASE_FILENAME = os.path.join('..', 'RELEASE')
+with open(RELEASE_FILENAME, 'r', encoding='utf-8') as infile:
+    release = f'v{infile.read().strip()}'
 
 
 # -- General configuration ---------------------------------------------------
