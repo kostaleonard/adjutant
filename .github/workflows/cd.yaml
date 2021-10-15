@@ -34,5 +34,11 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         make install
-    - name: Package and upload to PyPI
-      run: make help #make package_prod
+    - name: Build the package
+      run: |
+        rm -rf dist
+        python3 -m build
+    - name: Publish to PyPI
+      uses: pypa/gh-action-pypi-publish@master
+        with:
+          password: ${{ secrets.PYPI_API_TOKEN }}
