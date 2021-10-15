@@ -17,6 +17,7 @@ pytest_include_slow:
 	pytest tests --cov=adjutant
 
 documentation:
+	cd docs && sphinx-apidoc -o _apidoc ../adjutant
 	cd docs && make html
 
 package_prod:
