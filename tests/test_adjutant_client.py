@@ -7,10 +7,10 @@ import time
 import pytest
 from wandb.apis.public import Run
 from adjutant import adjutant_client
-from examples.mnist.mnist_model import WANDB_PROJECT_TITLE
 from tests.apis import is_discord_config_present, is_wandb_config_present
 
 WANDB_ENTITY = 'kostaleonard'
+WANDB_PROJECT_TITLE = 'mnist'
 DISCORD_TOKEN_ENVIRONMENT_VAR = 'DISCORD_ADJ_TOKEN'
 SETUP_TIMEOUT_SECONDS = 20
 NUM_KNOWN_PROJECT_RUNS = 60
