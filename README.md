@@ -2,6 +2,8 @@
 
 Adjutant is a package for managing ML experiments over Discord in conjunction with WandB.
 
+Adjutant allows users to run a Discord bot that provides updates on training jobs that have synced with WandB, and allows them to initiate new runs with different hyperparameters by posting in the Discord chat. Once the adjutant client is connected to Discord, users can start and get updates on training runs over Discord, from anywhere; no need to VPN and `ssh` into your office's servers, no need to open up your computer and try to remember where and in which files you need to set your hyperparameters. Just open up Discord and tell adjutant to start an experiment (or two, or three).
+
 ## Installation
 
 ```bash
