@@ -47,6 +47,8 @@ client.run('my-discord-token')
 
 When you run the script, you will see your bot post to your Discord chat with information on the WandB runs it found for the project.
 
+![The adjutant client has connected to Discord](media/adjutant_connected.png)
+
 ### Adjutant with experiment launching
 
 By providing a `run_experiment_script` constructor argument, Adjutant will be able to respond to user requests on Discord to run a new experiment. Adjutant will execute `run_experiment_script` in a subprocess so that it can still respond to new requests. `run_experiment_script` may also request another entity, e.g. Kubernetes, to initiate the experiment on its behalf rather than actually running the experiment itself.
@@ -68,3 +70,7 @@ client = Adjutant('my-wandb-entity',
                   run_experiment_script='run_experiment.sh')
 client.run('my-discord-token')
 ```
+
+And we can run an experiment by posting in Discord with the `$experiment` command. Adjutant will start the experiment using `run_experiment.sh` and post back on Discord when the run finishes.
+
+![The adjutant client initiates an experiment](media/adjutant_experiment.png)
