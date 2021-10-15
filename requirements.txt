@@ -7,3 +7,4 @@ numpy>=1.19.5
 tensorflow
 sphinx
 sphinx_rtd_theme
+build
