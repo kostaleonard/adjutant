@@ -12,7 +12,7 @@ pip install adjutant-discord
 
 ### Discord bot creation
 
-To allow adjutant to post to discord as a bot, first follow [these instructions](https://discordpy.readthedocs.io/en/stable/discord.html) for creating a Discord bot and adding it to your Server. You then create an `Adjutant` object with your bot token.
+To allow adjutant to post to Discord as a bot, first follow [these instructions](https://discordpy.readthedocs.io/en/stable/discord.html) for creating a Discord bot and adding it to your Server. You then create an `Adjutant` object with your bot token.
 
 **Note: Be careful not to share your bot's token. Consider storing it in an environment variable or file that is not checked in to version control.**
 
