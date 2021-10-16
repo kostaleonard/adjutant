@@ -99,7 +99,10 @@ class Adjutant(discord.Client):
         sets self.channel to the one requested by the user."""
         logging.info('Logged in as %s, %s', self.user.name, self.user.id)
         best_run_info = ''
-        best_run = Adjutant._get_run_with_best_val_loss(self._reported_runs)
+        try:
+            best_run = Adjutant._get_run_with_best_val_loss(self._reported_runs)
+        except ValueError:
+            best_run = None
         if best_run:
             best_val_loss = best_run.summary.get('best_val_loss', np.inf)
             best_run_info = (
