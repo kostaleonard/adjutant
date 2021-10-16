@@ -3,5 +3,5 @@ with WandB."""
 
 from adjutant import adjutant_client
 
-__version__ = '0.1.0'
+__version__ = '0.1.1'
 Adjutant = adjutant_client.Adjutant
