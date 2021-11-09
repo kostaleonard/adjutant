@@ -3,7 +3,7 @@
 import os
 import argparse
 import json
-from typing import Any, Optional
+from typing import Any, Optional, Dict
 from datetime import datetime
 import numpy as np
 from tensorflow.keras.datasets import mnist
@@ -55,7 +55,7 @@ def _normalize_images(images: np.ndarray) -> np.ndarray:
     return images.astype(np.float32) / MAX_PIXEL_VALUE
 
 
-def get_model(model_args: Optional[dict[str, Any]] = None) -> Model:
+def get_model(model_args: Optional[Dict[str, Any]] = None) -> Model:
     """Returns the model that will be used for training, testing, and
     prediction.
 
@@ -83,7 +83,7 @@ def get_model(model_args: Optional[dict[str, Any]] = None) -> Model:
 def train_model(model: Model,
                 x_train: np.ndarray,
                 y_train: np.ndarray,
-                train_args: Optional[dict[str, Any]] = None) -> History:
+                train_args: Optional[Dict[str, Any]] = None) -> History:
     """Trains the model and returns the History object from training.
 
     :param model: The Keras Model.
@@ -101,11 +101,10 @@ def train_model(model: Model,
     callbacks = []
     if train_args['use_wandb']:
         wandb.init(project=WANDB_PROJECT_TITLE, dir='.')
-        # TODO log the hyperparameters to wandb
         callbacks.append(WandbCallback())
     if train_args['tensorboard_logdir']:
         log_dir = os.path.join(str(train_args['tensorboard_logdir']),
-                               'logs_{0}'.format(datetime.now()))
+                               f'logs_{datetime.now()}')
         tensorboard_callback = TensorBoard(log_dir=log_dir)
         callbacks.append(tensorboard_callback)
     if train_args['model_checkpoint_filename']:
@@ -135,7 +134,7 @@ def eval_model(model: Model, x_test: np.ndarray, y_test: np.ndarray) -> float:
     return model.evaluate(x=x_test, y=y_test, return_dict=True)['accuracy']
 
 
-def run_experiment(hyperparams: dict) -> None:
+def run_experiment(hyperparams: Dict) -> None:
     """Trains a new model with the given hyperparameters.
 
     :param hyperparams: The hyperparameters to use in model creation and
@@ -145,10 +144,10 @@ def run_experiment(hyperparams: dict) -> None:
     model = get_model(hyperparams)
     _ = train_model(model, x_train, y_train, train_args=hyperparams)
     test_acc = eval_model(model, x_test, y_test)
-    print('Test accuracy: {0}'.format(test_acc))
+    print(f'Test accuracy: {test_acc}')
 
 
-def get_hyperparameters() -> dict:
+def get_hyperparameters() -> Dict:
     """Returns the hyperparameters from the command line arguments.
 
     :return: The hyperparameters to use in model creation and training.

@@ -1,6 +1,6 @@
 """Contains the Adjutant Discord client class."""
 
-from typing import Optional
+from typing import Optional, Dict
 import logging
 import json
 from json.decoder import JSONDecodeError
@@ -25,7 +25,7 @@ class Adjutant(discord.Client):
     _run_experiment_script: Optional[str]
     channel_name: str
     channel: Optional[TextChannel]
-    _reported_runs: dict[str, Run]
+    _reported_runs: Dict[str, Run]
 
     def __init__(
             self,
@@ -71,7 +71,7 @@ class Adjutant(discord.Client):
                 return channel
         return None
 
-    def _get_project_runs(self) -> dict[str, Run]:
+    def _get_project_runs(self) -> Dict[str, Run]:
         """Returns the dict of all Runs for this project. The keys are the names
         of the runs and the values are the corresponding Run objects.
 
@@ -84,7 +84,7 @@ class Adjutant(discord.Client):
         return {run.name: run for run in runs}
 
     @staticmethod
-    def _get_run_with_best_val_loss(runs: dict[str, Run]) -> Run:
+    def _get_run_with_best_val_loss(runs: Dict[str, Run]) -> Run:
         """Returns the Run with the best (i.e., lowest) validation loss.
 
         :param runs: The dict of Runs to filter. The keys are the names of the
@@ -136,7 +136,7 @@ class Adjutant(discord.Client):
         await self.wait_until_ready()
 
     @staticmethod
-    def _get_hyperparams(text: str) -> dict:
+    def _get_hyperparams(text: str) -> Dict:
         """Returns the hyperparameter dictionary from the text of the user's
         post. Returns the empty dict if the text contains an improperly
         formatted dictionary or no dictionary at all.
@@ -153,7 +153,7 @@ class Adjutant(discord.Client):
             hyperparams = {}
         return hyperparams
 
-    def run_experiment(self, hyperparams: dict) -> None:
+    def run_experiment(self, hyperparams: Dict) -> None:
         """Runs an experiment in a subprocess.
 
         :param hyperparams: The hyperparameters to pass to the experiment
