@@ -37,7 +37,7 @@ When your run finishes, you'll see adjutant post summary statistics and a link t
 
 ### Starting a job from Discord
 
-Because we have provided a `run_experiment_script` argument to the `Adjutant` constructor, we can initiate experiments directly in Discord. **This is the real value of adjutant--we can leave the client running, then start experiments and get updates over Discord as they complete, from anywhere.**
+Because we have provided a `run_experiment_script` argument to the `Adjutant` constructor, we can initiate experiments directly in Discord. Now we can leave the client running, then start experiments and get updates over Discord as they complete, from anywhere.
 
 With the adjutant client running, post in Discord `$experiment` to run a new experiment with the default hyperparameters. Once that completes, try posting `$experiment {"num_layers": 2, "epochs": 15}` to run with non-default hyperparameters. You've just initiated 2 runs over Discord using different sets of hyperparameters.
 
